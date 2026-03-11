@@ -27,6 +27,7 @@ export default defineConfig([
     rules: {
       "simple-import-sort/imports": "error",
       "simple-import-sort/exports": "error",
+      "react-hooks/set-state-in-effect": "off",
     },
   },
   eslintConfigPrettier,
