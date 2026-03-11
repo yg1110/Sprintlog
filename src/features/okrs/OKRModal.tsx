@@ -33,6 +33,12 @@ export function OKRModal({ isOpen, okr, setOkr, onClose, onSave, isEditing }: OK
     }));
   };
 
+  const toNumericValue = (raw: string | number): number => {
+    if (raw === "") return 0;
+    const n = Number(raw);
+    return isNaN(n) ? 0 : n;
+  };
+
   const updateKR = (id: string, field: keyof KeyResult, value: string | number) => {
     setOkr((prev) => ({
       ...prev,
@@ -161,18 +167,19 @@ export function OKRModal({ isOpen, okr, setOkr, onClose, onSave, isEditing }: OK
                             type="number"
                             value={kr.target_value}
                             onChange={(e) =>
-                              updateKR(kr.id, "target_value", Number(e.target.value))
+                              updateKR(kr.id, "target_value", toNumericValue(e.target.value))
                             }
+                            onFocus={(e) => e.target.select()}
                             className={inputClass}
                           />
                         </Field>
                         <Field label="현재치">
                           <input
-                            type="number"
                             value={kr.current_value}
                             onChange={(e) =>
-                              updateKR(kr.id, "current_value", Number(e.target.value))
+                              updateKR(kr.id, "current_value", toNumericValue(e.target.value))
                             }
+                            onFocus={(e) => e.target.select()}
                             className={inputClass}
                           />
                         </Field>
@@ -180,6 +187,7 @@ export function OKRModal({ isOpen, okr, setOkr, onClose, onSave, isEditing }: OK
                           <input
                             type="text"
                             value={kr.unit}
+                            onFocus={(e) => e.target.select()}
                             onChange={(e) => updateKR(kr.id, "unit", e.target.value)}
                             placeholder="건, %, 점"
                             className={inputClass}
