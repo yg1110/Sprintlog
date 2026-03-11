@@ -1,4 +1,4 @@
-import { BarChart3, BookOpen, LayoutDashboard, LogOut, Target, Zap } from "lucide-react";
+import { BarChart3, BookOpen, LayoutDashboard, LogOut, Target } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 
 import { cn } from "../lib/cn";
@@ -25,12 +25,10 @@ export function Layout({ children, onLogout }: LayoutProps) {
   return (
     <div className="flex h-full overflow-hidden bg-[#f8f8f8]">
       {/* Sidebar — desktop only */}
-      <aside className="fixed left-0 top-0 hidden h-screen w-60 flex-col border-r border-black/5 bg-white md:flex">
+      <aside className="fixed top-0 left-0 hidden h-screen w-60 flex-col border-r border-black/5 bg-white md:flex">
         {/* Logo */}
         <div className="flex items-center gap-2.5 px-6 py-6">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-black">
-            <Zap size={16} className="text-white" />
-          </div>
+          <img src="/favicon.svg" alt="Sprintlog" className="h-8 w-8" />
           <span className="text-base font-black tracking-tight">Sprintlog</span>
         </div>
 
@@ -68,10 +66,10 @@ export function Layout({ children, onLogout }: LayoutProps) {
       </aside>
 
       {/* Mobile top header */}
-      <header className="fixed left-0 right-0 top-0 z-30 flex h-14 items-center justify-between border-b border-black/5 bg-white px-4 md:hidden">
+      <header className="fixed top-0 right-0 left-0 z-30 flex h-14 items-center justify-between border-b border-black/5 bg-white px-4 md:hidden">
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-black">
-            <Zap size={13} className="text-white" />
+            <img src="/favicon.svg" alt="Sprintlog" className="h-8 w-8" />
           </div>
           <span className="text-sm font-black tracking-tight">Sprintlog</span>
         </div>
@@ -84,12 +82,12 @@ export function Layout({ children, onLogout }: LayoutProps) {
       </header>
 
       {/* Main */}
-      <main className="flex-1 overflow-y-auto overflow-x-hidden pt-14 pb-16 md:ml-60 md:pt-0 md:pb-0">
+      <main className="flex-1 overflow-x-hidden overflow-y-auto pt-14 pb-16 md:ml-60 md:pt-0 md:pb-0">
         <div className="mx-auto max-w-5xl px-4 py-6 sm:px-8 sm:py-10">{children}</div>
       </main>
 
       {/* Mobile bottom nav */}
-      <nav className="fixed bottom-0 left-0 right-0 z-30 flex border-t border-black/5 bg-white md:hidden">
+      <nav className="fixed right-0 bottom-0 left-0 z-30 flex border-t border-black/5 bg-white md:hidden">
         {navItems.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
@@ -139,13 +137,7 @@ export function StatCard({
   );
 }
 
-export function SectionHeader({
-  title,
-  action,
-}: {
-  title: string;
-  action?: React.ReactNode;
-}) {
+export function SectionHeader({ title, action }: { title: string; action?: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between">
       <h2 className="text-lg font-black tracking-tight">{title}</h2>
