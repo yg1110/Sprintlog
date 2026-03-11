@@ -37,9 +37,10 @@ interface LogsPageProps {
   logs: WorkLog[];
   okrs: OKR[];
   onSaveLog: (log: WorkLog) => Promise<void>;
+  onDeleteLog: (id: string) => Promise<void>;
 }
 
-export const LogsPage: React.FC<LogsPageProps> = ({ logs, okrs, onSaveLog }) => {
+export const LogsPage: React.FC<LogsPageProps> = ({ logs, okrs, onSaveLog, onDeleteLog }) => {
   const location = useLocation();
   const openDate = (location.state as { openDate?: string } | null)?.openDate;
 
@@ -186,6 +187,10 @@ export const LogsPage: React.FC<LogsPageProps> = ({ logs, okrs, onSaveLog }) => 
         onClose={() => setIsModalOpen(false)}
         onSave={async (log) => {
           await onSaveLog(log);
+          setIsModalOpen(false);
+        }}
+        onDelete={async (id) => {
+          await onDeleteLog(id);
           setIsModalOpen(false);
         }}
         log={editingLog}

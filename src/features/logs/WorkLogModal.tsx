@@ -9,6 +9,7 @@ interface WorkLogModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (log: WorkLog) => Promise<void>;
+  onDelete?: (id: string) => Promise<void>;
   log: WorkLog;
   setLog: React.Dispatch<React.SetStateAction<WorkLog>>;
   okrs: OKR[];
@@ -18,12 +19,14 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
   isOpen,
   onClose,
   onSave,
+  onDelete,
   log,
   setLog,
   okrs,
 }) => {
   const [activeTab, setActiveTab] = useState<"todo" | "details" | "okr">("todo");
   const [saving, setSaving] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const todosBySlot = (slot: TimeSlot) =>
     log.todo_items
@@ -80,6 +83,13 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
     }
   };
 
+  const handleDelete = async () => {
+    if (!log.id || !onDelete) return;
+    await onDelete(log.id);
+    setConfirmDelete(false);
+    onClose();
+  };
+
   const selectableOKRs = okrs.filter((o) => o.status !== "archived");
 
   const tabs = [
@@ -106,19 +116,58 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
             className="relative flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-[28px] bg-white shadow-2xl sm:max-w-4xl sm:rounded-[32px]"
           >
             {/* Header */}
-            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-black/5 bg-white px-5 py-4 sm:px-8 sm:py-6">
-              <div>
-                <h2 className="text-xl font-black tracking-tight">
-                  {log.log_date.replace(/-/g, ".")}
-                </h2>
-                <p className="mt-0.5 text-sm font-medium text-black/30">오늘의 업무를 기록하세요</p>
-              </div>
-              <button
-                onClick={onClose}
-                className="flex h-10 w-10 items-center justify-center rounded-xl bg-black/5 transition-colors hover:bg-black/10"
-              >
-                <X size={20} />
-              </button>
+            <div className="sticky top-0 z-10 border-b border-black/5 bg-white px-5 py-4 sm:px-8 sm:py-5">
+              {confirmDelete ? (
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-black text-red-500">업무일지를 삭제할까요?</p>
+                    <p className="mt-0.5 text-xs font-medium text-black/40">
+                      이 작업은 되돌릴 수 없습니다.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setConfirmDelete(false)}
+                      className="rounded-xl px-4 py-2 text-sm font-bold text-black/40 transition-colors hover:text-black"
+                    >
+                      취소
+                    </button>
+                    <button
+                      onClick={handleDelete}
+                      className="rounded-xl bg-red-500 px-4 py-2 text-sm font-bold text-white transition-all hover:bg-red-600"
+                    >
+                      삭제
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-black tracking-tight">
+                      {log.log_date.replace(/-/g, ".")}
+                    </h2>
+                    <p className="mt-0.5 text-sm font-medium text-black/30">
+                      오늘의 업무를 기록하세요
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {log.id && onDelete && (
+                      <button
+                        onClick={() => setConfirmDelete(true)}
+                        className="flex h-10 w-10 items-center justify-center rounded-xl bg-black/5 text-black transition-colors hover:bg-black/10"
+                      >
+                        <Trash2 size={17} />
+                      </button>
+                    )}
+                    <button
+                      onClick={onClose}
+                      className="flex h-10 w-10 items-center justify-center rounded-xl bg-black/5 transition-colors hover:bg-black/10"
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Tabs */}
@@ -182,47 +231,56 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                       {
                         key: "done_text" as const,
                         label: "✅ 한 일",
-                        placeholder: "예: 결제 API 엔드포인트 3개 구현 완료\n예: 대시보드 로딩 속도 4.2s → 1.8s 개선\n예: 유닛 테스트 커버리지 62% → 78% 달성",
+                        placeholder:
+                          "예: 결제 API 엔드포인트 3개 구현 완료\n예: 대시보드 로딩 속도 4.2s → 1.8s 개선\n예: 유닛 테스트 커버리지 62% → 78% 달성",
                       },
                       {
                         key: "issue_text" as const,
                         label: "🚨 이슈 / 장애 / 버그",
-                        placeholder: "예: 결제 완료 후 DB 트랜잭션 실패율 3% 발생 (원인: 타임아웃 5s → 15s로 조정)\n예: 모바일 Safari에서 모달 스크롤 불가 재현율 100%",
+                        placeholder:
+                          "예: 결제 완료 후 DB 트랜잭션 실패율 3% 발생 (원인: 타임아웃 5s → 15s로 조정)\n예: 모바일 Safari에서 모달 스크롤 불가 재현율 100%",
                       },
                       {
                         key: "blocked_text" as const,
                         label: "🧱 막힌 것",
-                        placeholder: "예: 외부 결제 API 응답 지연으로 테스트 불가 (평균 8s, SLA 2s 초과)\n예: 디자인 시안 미확정으로 신규 화면 개발 착수 불가",
+                        placeholder:
+                          "예: 외부 결제 API 응답 지연으로 테스트 불가 (평균 8s, SLA 2s 초과)\n예: 디자인 시안 미확정으로 신규 화면 개발 착수 불가",
                       },
                       {
                         key: "decision_text" as const,
                         label: "🧠 설계 / 의사결정",
-                        placeholder: "예: 알림 발송을 동기 → 비동기 큐 방식으로 변경 (처리량 200/min → 2,000/min 예상)\n예: 이미지 CDN 도입으로 월 트래픽 비용 40% 절감 예상",
+                        placeholder:
+                          "예: 알림 발송을 동기 → 비동기 큐 방식으로 변경 (처리량 200/min → 2,000/min 예상)\n예: 이미지 CDN 도입으로 월 트래픽 비용 40% 절감 예상",
                       },
                       {
                         key: "learned_text" as const,
                         label: "📚 배운점",
-                        placeholder: "예: React Query staleTime 조정으로 불필요한 API 호출 70% 감소\n예: DB 인덱스 추가 후 쿼리 실행 시간 1.2s → 0.08s",
+                        placeholder:
+                          "예: React Query staleTime 조정으로 불필요한 API 호출 70% 감소\n예: DB 인덱스 추가 후 쿼리 실행 시간 1.2s → 0.08s",
                       },
                       {
                         key: "tomorrow_plan_text" as const,
                         label: "📌 내일 할일",
-                        placeholder: "예: 알림 발송 모듈 구현 (목표: 발송 성공률 99.5% 이상)\n예: 상품 검색 응답 속도 현재 3s → 목표 1s 이하로 최적화",
+                        placeholder:
+                          "예: 알림 발송 모듈 구현 (목표: 발송 성공률 99.5% 이상)\n예: 상품 검색 응답 속도 현재 3s → 목표 1s 이하로 최적화",
                       },
                       {
                         key: "metric_change_text" as const,
                         label: "📈 수치 변화",
-                        placeholder: "예: 일일 활성 사용자 1,200명 → 1,450명 (+20.8%)\n예: API 에러율 2.1% → 0.4% / 페이지 이탈률 68% → 52%",
+                        placeholder:
+                          "예: 일일 활성 사용자 1,200명 → 1,450명 (+20.8%)\n예: API 에러율 2.1% → 0.4% / 페이지 이탈률 68% → 52%",
                       },
                       {
                         key: "feedback_text" as const,
                         label: "🗣️ 받은 피드백",
-                        placeholder: "예: 코드 리뷰 — 쿼리 N+1 문제 지적, 배치 조회로 수정 필요\n예: PM — 온보딩 완료율 목표 60%인데 현재 38%, UX 개선 요청",
+                        placeholder:
+                          "예: 코드 리뷰 — 쿼리 N+1 문제 지적, 배치 조회로 수정 필요\n예: PM — 온보딩 완료율 목표 60%인데 현재 38%, UX 개선 요청",
                       },
                       {
                         key: "improvement_text" as const,
                         label: "🎯 개선 포인트",
-                        placeholder: "예: 작업 전 예상 소요 시간 기록 → 실제와 비교해 추정 정확도 높이기\n예: PR 단위를 기능 전체가 아닌 500줄 이하로 쪼개 리뷰 속도 개선",
+                        placeholder:
+                          "예: 작업 전 예상 소요 시간 기록 → 실제와 비교해 추정 정확도 높이기\n예: PR 단위를 기능 전체가 아닌 500줄 이하로 쪼개 리뷰 속도 개선",
                       },
                     ].map((field) => (
                       <div key={field.key} className="rounded-2xl bg-white p-4 shadow-sm">

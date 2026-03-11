@@ -120,6 +120,11 @@ export async function getWorkLogs(): Promise<WorkLog[]> {
   return ((data ?? []) as WorkLogRow[]).map(rowToWorkLog);
 }
 
+export async function deleteWorkLog(id: string): Promise<void> {
+  const { error } = await supabase.from("work_logs").delete().eq("id", id);
+  if (error) throw error;
+}
+
 export async function upsertWorkLog(log: WorkLog): Promise<WorkLog> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("로그인이 필요합니다.");

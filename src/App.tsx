@@ -12,6 +12,7 @@ import { OKRsPage } from "./features/okrs/OKRsPage";
 import {
   createOKR,
   deleteOKR,
+  deleteWorkLog,
   getOKRs,
   getWorkLogs,
   signOut,
@@ -115,6 +116,11 @@ function AppRouter() {
     setOkrs((prev) => prev.filter((o) => o.id !== id));
   };
 
+  const handleDeleteLog = async (id: string) => {
+    await deleteWorkLog(id);
+    setLogs((prev) => prev.filter((l) => l.id !== id));
+  };
+
   const handleOpenWorkLog = (date: string) => {
     const existing = logs.find((l) => l.log_date === date);
     setDashLog(existing ? { ...existing } : EMPTY_LOG(date));
@@ -169,7 +175,7 @@ function AppRouter() {
             />
             <Route
               path="/work-logs"
-              element={<LogsPage logs={logs} okrs={okrs} onSaveLog={handleSaveLog} />}
+              element={<LogsPage logs={logs} okrs={okrs} onSaveLog={handleSaveLog} onDeleteLog={handleDeleteLog} />}
             />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
@@ -181,6 +187,7 @@ function AppRouter() {
               await handleSaveLog(log);
               setDashModal((v) => ({ ...v, open: false }));
             }}
+            onDelete={handleDeleteLog}
             log={dashLog}
             setLog={setDashLog}
             okrs={okrs}
