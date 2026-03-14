@@ -1,4 +1,4 @@
-import { Check, Plus, Trash2, X } from "lucide-react";
+import { Check, ChevronDown, Plus, Search, Trash2, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 
@@ -27,6 +27,8 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
   const [activeTab, setActiveTab] = useState<"todo" | "details" | "okr">("todo");
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [krSearch, setKrSearch] = useState("");
+  const [krLimit, setKrLimit] = useState(10);
 
   const todosBySlot = (slot: TimeSlot) =>
     log.todo_items
@@ -92,8 +94,24 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
 
   const selectableOKRs = okrs.filter((o) => o.status !== "archived");
 
+  // Flatten KRs sorted by OKR end_date desc (most recent first)
+  const allKRs = selectableOKRs
+    .slice()
+    .sort((a, b) => b.end_date.localeCompare(a.end_date))
+    .flatMap((okr) => (okr.key_results ?? []).map((kr) => ({ kr, okr })));
+
+  const filteredKRs = krSearch.trim()
+    ? allKRs.filter(
+        ({ kr, okr }) =>
+          kr.title.toLowerCase().includes(krSearch.toLowerCase()) ||
+          okr.title.toLowerCase().includes(krSearch.toLowerCase()),
+      )
+    : allKRs;
+
+  const visibleKRs = filteredKRs.slice(0, krLimit);
+
   const tabs = [
-    { id: "todo", label: "투두 리스트" },
+    { id: "todo", label: "할 일" },
     { id: "details", label: "상세 기록" },
     { id: "okr", label: "OKR 연결" },
   ] as const;
@@ -101,19 +119,19 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6">
+        <div className="fixed inset-0 z-50 flex items-end justify-center overscroll-none sm:items-center sm:p-6">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            className="absolute inset-0 touch-none bg-black/40 backdrop-blur-sm"
           />
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-[28px] bg-white shadow-2xl sm:max-w-4xl sm:rounded-[32px]"
+            className="relative flex h-[92vh] w-full flex-col overflow-hidden overscroll-none rounded-t-[28px] bg-[#f5f5f5] shadow-2xl sm:max-w-4xl sm:rounded-[32px]"
           >
             {/* Header */}
             <div className="sticky top-0 z-10 border-b border-black/5 bg-white px-5 py-4 sm:px-8 sm:py-5">
@@ -189,7 +207,7 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto bg-[#f5f5f5] p-4 sm:p-6">
+            <div className="flex-1 overflow-y-auto overscroll-contain bg-[#f5f5f5] p-4 sm:p-6">
               {activeTab === "todo" && (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <TodoSection
@@ -301,63 +319,89 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
               )}
 
               {activeTab === "okr" && (
-                <div className="space-y-5">
+                <div className="space-y-4">
                   <p className="px-1 text-[11px] font-bold tracking-widest text-black/40 uppercase">
                     관련 핵심 결과(KR) 선택
                   </p>
-                  {selectableOKRs.length === 0 && (
+
+                  {/* Search */}
+                  <div className="relative">
+                    <Search
+                      size={15}
+                      className="absolute top-1/2 left-3.5 -translate-y-1/2 text-black/30"
+                    />
+                    <input
+                      type="text"
+                      value={krSearch}
+                      onChange={(e) => {
+                        setKrSearch(e.target.value);
+                        setKrLimit(10);
+                      }}
+                      placeholder="KR 또는 목표 이름으로 검색"
+                      className="w-full rounded-xl border border-black/10 bg-white py-2.5 pr-4 pl-9 text-sm font-medium transition-all outline-none focus:border-black/25"
+                    />
+                  </div>
+
+                  {allKRs.length === 0 && (
                     <div className="rounded-2xl bg-white py-12 text-center font-bold text-black/20 shadow-sm">
                       등록된 OKR이 없습니다.
                     </div>
                   )}
-                  {selectableOKRs.map((okr) => {
-                    const krs = okr.key_results ?? [];
-                    if (krs.length === 0) return null;
-                    return (
-                      <div key={okr.id}>
-                        <p className="mb-2 border-l-2 border-black pl-3 text-sm font-bold">
-                          {okr.title}
-                        </p>
-                        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                          {krs.map((kr) => {
-                            const selected = (log.kr_ids ?? []).includes(kr.id);
-                            return (
-                              <button
-                                key={kr.id}
-                                onClick={() => handleToggleKR(kr.id)}
-                                className={cn(
-                                  "flex items-start gap-3 rounded-2xl border-2 p-4 text-left shadow-sm transition-all",
-                                  selected
-                                    ? "border-black bg-black/5"
-                                    : "border-transparent bg-white hover:border-black/15",
-                                )}
-                              >
-                                <div
-                                  className={cn(
-                                    "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all",
-                                    selected
-                                      ? "border-black bg-black text-white"
-                                      : "border-black/20",
-                                  )}
-                                >
-                                  {selected && <Check size={12} />}
-                                </div>
-                                <div>
-                                  <div className="text-sm font-bold text-black">
-                                    {kr.title || "제목 없음"}
-                                  </div>
-                                  <div className="mt-0.5 text-[11px] font-medium text-black/40">
-                                    {kr.current_value} / {kr.target_value}
-                                    {kr.unit ? ` ${kr.unit}` : ""}
-                                  </div>
-                                </div>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })}
+
+                  {allKRs.length > 0 && filteredKRs.length === 0 && (
+                    <div className="rounded-2xl bg-white py-12 text-center font-bold text-black/20 shadow-sm">
+                      검색 결과가 없습니다.
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    {visibleKRs.map(({ kr, okr }) => {
+                      const selected = (log.kr_ids ?? []).includes(kr.id);
+                      return (
+                        <button
+                          key={kr.id}
+                          onClick={() => handleToggleKR(kr.id)}
+                          className={cn(
+                            "flex items-start gap-3 rounded-2xl border-2 p-4 text-left shadow-sm transition-all",
+                            selected
+                              ? "border-black bg-black/5"
+                              : "border-transparent bg-white hover:border-black/15",
+                          )}
+                        >
+                          <div
+                            className={cn(
+                              "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all",
+                              selected ? "border-black bg-black text-white" : "border-black/20",
+                            )}
+                          >
+                            {selected && <Check size={12} />}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="text-sm font-bold text-black">
+                              {kr.title || "제목 없음"}
+                            </div>
+                            <div className="mt-0.5 text-[11px] font-medium text-black/40">
+                              {okr.title}
+                            </div>
+                            <div className="mt-0.5 text-[11px] font-medium text-black/30">
+                              {kr.current_value} / {kr.target_value}
+                              {kr.unit ? ` ${kr.unit}` : ""}
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {filteredKRs.length > krLimit && (
+                    <button
+                      onClick={() => setKrLimit((prev) => prev + 10)}
+                      className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-white py-3 text-sm font-bold text-black/40 shadow-sm transition-all hover:text-black"
+                    >
+                      <ChevronDown size={15} />
+                      더보기 ({filteredKRs.length - krLimit}개 남음)
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -401,7 +445,7 @@ function TodoSection({
   onRemove: (id: string) => void;
 }) {
   return (
-    <div className="rounded-2xl bg-white p-4 shadow-sm sm:p-5">
+    <div className="min-h-[59dvh] rounded-2xl bg-white p-4 shadow-sm sm:p-5">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-sm font-bold text-black">{title}</h3>
         <button
