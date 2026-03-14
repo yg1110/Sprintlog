@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import { Layout } from "./components/Layout";
+import { ArchivePage } from "./features/archive/ArchivePage";
 import { AuthPage } from "./features/auth/AuthPage";
 import { DashboardPage } from "./features/dashboard/DashboardPage";
 import { LogsPage } from "./features/logs/LogsPage";
@@ -170,6 +171,7 @@ function AppRouter() {
                   logs={logs}
                   onSaveOKR={handleSaveOKR}
                   onDeleteOKR={handleDeleteOKR}
+                  onOpenWorkLog={handleOpenWorkLog}
                 />
               }
             />
@@ -177,6 +179,7 @@ function AppRouter() {
               path="/work-logs"
               element={<LogsPage logs={logs} okrs={okrs} onSaveLog={handleSaveLog} onDeleteLog={handleDeleteLog} />}
             />
+            <Route path="/archive" element={<ArchivePage logs={logs} onOpenWorkLog={handleOpenWorkLog} />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
 

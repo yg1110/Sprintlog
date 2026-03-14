@@ -2,7 +2,6 @@ import { format, parseISO } from "date-fns";
 import { ko } from "date-fns/locale";
 import { ChevronDown, ChevronRight, CircleDot, MoreHorizontal, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import { EmptyState, SectionHeader } from "../../components/Layout";
 import { cn } from "../../lib/cn";
@@ -30,6 +29,7 @@ interface OKRsPageProps {
   logs: WorkLog[];
   onSaveOKR: (okr: OKRDraft) => Promise<void>;
   onDeleteOKR: (id: string) => Promise<void>;
+  onOpenWorkLog: (date: string) => void;
 }
 
 const PERIOD_BADGE_STYLES: Record<OKR["period_type"], string> = {
@@ -39,7 +39,7 @@ const PERIOD_BADGE_STYLES: Record<OKR["period_type"], string> = {
   yearly: "bg-orange-100 text-orange-700",
 };
 
-export function OKRsPage({ okrs, logs, onSaveOKR, onDeleteOKR }: OKRsPageProps) {
+export function OKRsPage({ okrs, logs, onSaveOKR, onDeleteOKR, onOpenWorkLog }: OKRsPageProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingOKR, setEditingOKR] = useState<OKRDraft>(createEmptyOKR());
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -98,6 +98,7 @@ export function OKRsPage({ okrs, logs, onSaveOKR, onDeleteOKR }: OKRsPageProps) 
               logs={logs}
               onEdit={() => openEdit(okr)}
               onDelete={() => setDeleteId(okr.id)}
+              onOpenWorkLog={onOpenWorkLog}
             />
           ))}
         </div>
@@ -113,6 +114,7 @@ export function OKRsPage({ okrs, logs, onSaveOKR, onDeleteOKR }: OKRsPageProps) 
               logs={logs}
               onEdit={() => openEdit(okr)}
               onDelete={() => setDeleteId(okr.id)}
+              onOpenWorkLog={onOpenWorkLog}
             />
           ))}
         </div>
@@ -162,15 +164,16 @@ function OKRCard({
   logs,
   onEdit,
   onDelete,
+  onOpenWorkLog,
 }: {
   okr: OKR;
   logs: WorkLog[];
   onEdit: () => void;
   onDelete: () => void;
+  onOpenWorkLog: (date: string) => void;
 }) {
   const krs = okr.key_results ?? [];
   const [expandedKrId, setExpandedKrId] = useState<string | null>(null);
-  const navigate = useNavigate();
 
   // KR별 연결된 업무일지 수 → current_value로 사용
   const linkedLogsMap = Object.fromEntries(
@@ -317,11 +320,7 @@ function OKRCard({
                           {linkedLogs.map((log) => (
                             <button
                               key={log.log_date}
-                              onClick={() =>
-                                navigate("/work-logs", {
-                                  state: { openDate: log.log_date },
-                                })
-                              }
+                              onClick={() => onOpenWorkLog(log.log_date)}
                               className="group/log w-full rounded-xl bg-white px-3 py-2.5 text-left shadow-sm transition-all hover:shadow-md hover:ring-1 hover:ring-black/10"
                             >
                               <div className="flex items-center justify-between gap-2">
