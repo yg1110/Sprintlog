@@ -94,6 +94,26 @@ export function OKRModal({ isOpen, okr, setOkr, onClose, onSave, isEditing }: OK
                 />
               </Field>
 
+              {/* Status — 수정 시에만 표시 */}
+              {isEditing && (
+                <Field label="상태">
+                  <select
+                    value={okr.status}
+                    onChange={(e) =>
+                      setOkr((prev) => ({
+                        ...prev,
+                        status: e.target.value as OKR["status"],
+                      }))
+                    }
+                    className={inputClass}
+                  >
+                    <option value="active">진행중</option>
+                    <option value="completed">완료</option>
+                    <option value="archived">보관</option>
+                  </select>
+                </Field>
+              )}
+
               {/* Period + Dates */}
               <div className="grid grid-cols-3 gap-3">
                 <Field label="기간 유형">

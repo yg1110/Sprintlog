@@ -1,12 +1,12 @@
 import { format, parseISO } from "date-fns";
 import { ko } from "date-fns/locale";
-import { ChevronDown, ChevronRight, CircleDot, MoreHorizontal, Plus, Trash2 } from "lucide-react";
+import { Archive, ChevronDown, ChevronRight, CircleDot, MoreHorizontal, Plus, RotateCcw, Search, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import { EmptyState, SectionHeader } from "../../components/Layout";
 import { cn } from "../../lib/cn";
 import type { OKR, WorkLog } from "../../types";
-import { PERIOD_TYPE_LABEL } from "../../types";
+import { PERIOD_TYPE_LABEL, type PeriodType } from "../../types";
 import type { OKRDraft } from "./OKRModal";
 import { OKRModal } from "./OKRModal";
 
@@ -39,10 +39,31 @@ const PERIOD_BADGE_STYLES: Record<OKR["period_type"], string> = {
   yearly: "bg-orange-100 text-orange-700",
 };
 
+type OKRStatusFilter = "all" | OKR["status"];
+type PeriodFilter = "all" | PeriodType;
+
+const STATUS_FILTERS: { value: OKRStatusFilter; label: string }[] = [
+  { value: "all", label: "전체" },
+  { value: "active", label: "진행중" },
+  { value: "completed", label: "완료" },
+  { value: "archived", label: "보관" },
+];
+
+const PERIOD_FILTERS: { value: PeriodFilter; label: string }[] = [
+  { value: "all", label: "전체" },
+  { value: "sprint", label: "주간" },
+  { value: "monthly", label: "월간" },
+  { value: "quarterly", label: "분기" },
+  { value: "yearly", label: "연간" },
+];
+
 export function OKRsPage({ okrs, logs, onSaveOKR, onDeleteOKR, onOpenWorkLog }: OKRsPageProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingOKR, setEditingOKR] = useState<OKRDraft>(createEmptyOKR());
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<OKRStatusFilter>("all");
+  const [periodFilter, setPeriodFilter] = useState<PeriodFilter>("all");
 
   const openCreate = () => {
     setEditingOKR(createEmptyOKR());
@@ -67,11 +88,29 @@ export function OKRsPage({ okrs, logs, onSaveOKR, onDeleteOKR, onOpenWorkLog }: 
     }
   };
 
-  const active = okrs.filter((o) => o.status !== "archived");
-  const archived = okrs.filter((o) => o.status === "archived");
+  const handleArchive = async (okr: OKR) => {
+    const nextStatus = okr.status === "archived" ? "active" : "archived";
+    await onSaveOKR({ ...okr, status: nextStatus });
+  };
+
+  const filtered = okrs.filter((o) => {
+    if (statusFilter !== "all" && o.status !== statusFilter) return false;
+    if (periodFilter !== "all" && o.period_type !== periodFilter) return false;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      const inTitle = o.title.toLowerCase().includes(q);
+      const inKR = (o.key_results ?? []).some((kr) => kr.title.toLowerCase().includes(q));
+      if (!inTitle && !inKR) return false;
+    }
+    return true;
+  });
+
+  const active = filtered.filter((o) => o.status !== "archived");
+  const archived = filtered.filter((o) => o.status === "archived");
+  const isFiltering = search.trim() || statusFilter !== "all" || periodFilter !== "all";
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <SectionHeader
         title="OKR"
         action={
@@ -85,12 +124,64 @@ export function OKRsPage({ okrs, logs, onSaveOKR, onDeleteOKR, onOpenWorkLog }: 
         }
       />
 
+      {/* Search + filters */}
+      <div className="space-y-3">
+        <div className="relative">
+          <Search size={15} className="absolute top-1/2 left-3.5 -translate-y-1/2 text-black/30" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="목표 또는 KR 이름으로 검색"
+            className="w-full rounded-xl border border-black/10 bg-white py-2.5 pr-4 pl-9 text-sm font-medium outline-none transition-all focus:border-black/25"
+          />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {STATUS_FILTERS.map((f) => (
+            <button
+              key={f.value}
+              onClick={() => setStatusFilter(f.value)}
+              className={cn(
+                "rounded-lg px-3 py-1.5 text-xs font-bold transition-all",
+                statusFilter === f.value
+                  ? "bg-black text-white"
+                  : "bg-white text-black/40 hover:text-black",
+              )}
+            >
+              {f.label}
+            </button>
+          ))}
+          <div className="mx-1 w-px self-stretch bg-black/10" />
+          {PERIOD_FILTERS.map((f) => (
+            <button
+              key={f.value}
+              onClick={() => setPeriodFilter(f.value)}
+              className={cn(
+                "rounded-lg px-3 py-1.5 text-xs font-bold transition-all",
+                periodFilter === f.value
+                  ? "bg-black text-white"
+                  : "bg-white text-black/40 hover:text-black",
+              )}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {okrs.length === 0 && (
         <EmptyState title="등록된 OKR이 없어요." sub="첫 목표를 만들어보세요." />
       )}
 
+      {okrs.length > 0 && filtered.length === 0 && (
+        <EmptyState title="검색 결과가 없습니다." sub="다른 검색어나 필터를 사용해보세요." />
+      )}
+
       {active.length > 0 && (
         <div className="space-y-3">
+          {!isFiltering && (
+            <h3 className="text-xs font-bold tracking-widest text-black/30 uppercase">진행중</h3>
+          )}
           {active.map((okr) => (
             <OKRCard
               key={okr.id}
@@ -98,6 +189,7 @@ export function OKRsPage({ okrs, logs, onSaveOKR, onDeleteOKR, onOpenWorkLog }: 
               logs={logs}
               onEdit={() => openEdit(okr)}
               onDelete={() => setDeleteId(okr.id)}
+              onArchive={() => handleArchive(okr)}
               onOpenWorkLog={onOpenWorkLog}
             />
           ))}
@@ -114,6 +206,7 @@ export function OKRsPage({ okrs, logs, onSaveOKR, onDeleteOKR, onOpenWorkLog }: 
               logs={logs}
               onEdit={() => openEdit(okr)}
               onDelete={() => setDeleteId(okr.id)}
+              onArchive={() => handleArchive(okr)}
               onOpenWorkLog={onOpenWorkLog}
             />
           ))}
@@ -164,12 +257,14 @@ function OKRCard({
   logs,
   onEdit,
   onDelete,
+  onArchive,
   onOpenWorkLog,
 }: {
   okr: OKR;
   logs: WorkLog[];
   onEdit: () => void;
   onDelete: () => void;
+  onArchive: () => void;
   onOpenWorkLog: (date: string) => void;
 }) {
   const krs = okr.key_results ?? [];
@@ -195,13 +290,20 @@ function OKRCard({
 
   return (
     <div className="group relative rounded-3xl border border-black/5 bg-white p-6 shadow-sm transition-all hover:shadow-md">
-      {/* Edit / Delete buttons */}
+      {/* Edit / Archive / Delete buttons */}
       <div className="absolute top-5 right-5 flex items-center gap-1 opacity-100 transition-opacity group-hover:opacity-100 md:opacity-0">
         <button
           onClick={onEdit}
           className="flex h-8 w-8 items-center justify-center rounded-lg text-black/30 transition-colors hover:bg-black/5 hover:text-black"
         >
           <MoreHorizontal size={16} />
+        </button>
+        <button
+          onClick={onArchive}
+          title={okr.status === "archived" ? "복원" : "보관"}
+          className="flex h-8 w-8 items-center justify-center rounded-lg text-black/30 transition-colors hover:bg-amber-50 hover:text-amber-500"
+        >
+          {okr.status === "archived" ? <RotateCcw size={14} /> : <Archive size={14} />}
         </button>
         <button
           onClick={onDelete}
