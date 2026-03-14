@@ -43,6 +43,7 @@ const EMPTY_LOG = (dateStr: string): WorkLog => ({
   todo_items: [],
   kr_ids: [],
   project_ids: [],
+  collaborators: [],
 });
 
 function AppRouter() {
@@ -230,6 +231,7 @@ function AppRouter() {
             setLog={setDashLog}
             okrs={okrs}
             projects={projects}
+            allCollaborators={[...new Set(logs.flatMap((l) => l.collaborators ?? []))]}
           />
         </>
       )}

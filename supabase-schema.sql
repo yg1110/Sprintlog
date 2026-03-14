@@ -77,6 +77,8 @@ create table if not exists public.work_logs (
   feedback_text text,
   improvement_text text,
 
+  collaborators text[] not null default '{}',
+
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
 
@@ -87,6 +89,7 @@ comment on table public.work_logs is '날짜별 업무기록 테이블';
 
 create index if not exists idx_work_logs_user_id on public.work_logs(user_id);
 create index if not exists idx_work_logs_log_date on public.work_logs(log_date);
+create index if not exists idx_work_logs_collaborators on public.work_logs using gin(collaborators);
 
 -- =========================================================
 -- 4. todo_items
@@ -455,3 +458,16 @@ create policy "work_log_projects_delete_own"
 on public.work_log_projects
 for delete
 using (user_id = auth.uid());
+
+-- =========================================================
+-- 마이그레이션: 기존 DB에 신규 컬럼/인덱스 추가
+-- (이미 테이블이 존재할 경우 아래 구문을 실행)
+-- =========================================================
+
+-- work_logs 에 collaborators 컬럼 추가
+alter table public.work_logs
+  add column if not exists collaborators text[] not null default '{}';
+
+-- collaborators GIN 인덱스 (이미 없을 경우에만 생성)
+create index if not exists idx_work_logs_collaborators
+  on public.work_logs using gin(collaborators);

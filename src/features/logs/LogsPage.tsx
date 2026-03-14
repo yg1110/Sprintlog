@@ -32,6 +32,7 @@ const EMPTY_LOG = (dateStr: string): WorkLog => ({
   todo_items: [],
   kr_ids: [],
   project_ids: [],
+  collaborators: [],
 });
 
 interface LogsPageProps {
@@ -199,6 +200,7 @@ export const LogsPage: React.FC<LogsPageProps> = ({ logs, okrs, projects, onSave
         setLog={setEditingLog}
         okrs={okrs}
         projects={projects}
+        allCollaborators={[...new Set(logs.flatMap((l) => l.collaborators ?? []))]}
       />
     </div>
   );

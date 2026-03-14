@@ -132,6 +132,7 @@ type WorkLogRow = {
   metric_change_text: string | null;
   feedback_text: string | null;
   improvement_text: string | null;
+  collaborators: string[] | null;
   todo_items: { id: string; time_slot: string; content: string; is_done: boolean; display_order: number }[];
   work_log_krs: { kr_id: string }[];
   work_log_projects: { project_id: string }[];
@@ -154,6 +155,7 @@ function rowToWorkLog(row: WorkLogRow): WorkLog {
     todo_items: (row.todo_items ?? []) as TodoItem[],
     kr_ids: (row.work_log_krs ?? []).map((r) => r.kr_id),
     project_ids: (row.work_log_projects ?? []).map((r) => r.project_id),
+    collaborators: row.collaborators ?? [],
   };
 }
 
@@ -161,7 +163,7 @@ export async function getWorkLogs(): Promise<WorkLog[]> {
   const { data, error } = await supabase
     .from("work_logs")
     .select(
-      "id, log_date, summary, done_text, issue_text, blocked_text, decision_text, learned_text, tomorrow_plan_text, metric_change_text, feedback_text, improvement_text, todo_items(id, time_slot, content, is_done, display_order), work_log_krs(kr_id), work_log_projects(project_id)",
+      "id, log_date, summary, done_text, issue_text, blocked_text, decision_text, learned_text, tomorrow_plan_text, metric_change_text, feedback_text, improvement_text, collaborators, todo_items(id, time_slot, content, is_done, display_order), work_log_krs(kr_id), work_log_projects(project_id)",
     )
     .order("log_date", { ascending: false });
   if (error) throw error;
@@ -195,6 +197,7 @@ export async function upsertWorkLog(log: WorkLog): Promise<WorkLog> {
         metric_change_text: log.metric_change_text,
         feedback_text: log.feedback_text,
         improvement_text: log.improvement_text,
+        collaborators: log.collaborators ?? [],
       },
       { onConflict: "user_id,log_date" },
     )
@@ -249,7 +252,7 @@ export async function upsertWorkLog(log: WorkLog): Promise<WorkLog> {
   const { data: fullData, error: fetchError } = await supabase
     .from("work_logs")
     .select(
-      "id, log_date, summary, done_text, issue_text, blocked_text, decision_text, learned_text, tomorrow_plan_text, metric_change_text, feedback_text, improvement_text, todo_items(id, time_slot, content, is_done, display_order), work_log_krs(kr_id), work_log_projects(project_id)",
+      "id, log_date, summary, done_text, issue_text, blocked_text, decision_text, learned_text, tomorrow_plan_text, metric_change_text, feedback_text, improvement_text, collaborators, todo_items(id, time_slot, content, is_done, display_order), work_log_krs(kr_id), work_log_projects(project_id)",
     )
     .eq("id", workLogId)
     .single();

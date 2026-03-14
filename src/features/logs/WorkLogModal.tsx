@@ -1,4 +1,4 @@
-import { Check, ChevronDown, Plus, Search, Trash2, X } from "lucide-react";
+import { Check, ChevronDown, Plus, Search, Trash2, UserPlus, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 
@@ -15,6 +15,7 @@ interface WorkLogModalProps {
   setLog: React.Dispatch<React.SetStateAction<WorkLog>>;
   okrs: OKR[];
   projects: Project[];
+  allCollaborators: string[];
 }
 
 export const WorkLogModal: React.FC<WorkLogModalProps> = ({
@@ -26,10 +27,13 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
   setLog,
   okrs,
   projects,
+  allCollaborators,
 }) => {
   const [activeTab, setActiveTab] = useState<"todo" | "details" | "okr" | "project">("todo");
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [collaboratorInput, setCollaboratorInput] = useState("");
+  const [collaboratorDropdown, setCollaboratorDropdown] = useState(false);
   const [krSearch, setKrSearch] = useState("");
   const [krLimit, setKrLimit] = useState(10);
   const [projectSearch, setProjectSearch] = useState("");
@@ -256,6 +260,121 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
 
               {activeTab === "details" && (
                 <div className="space-y-4">
+                  {/* 동료 태그 */}
+                  {(() => {
+                    const current = log.collaborators ?? [];
+                    const isDuplicate =
+                      collaboratorInput.trim() !== "" &&
+                      current.includes(collaboratorInput.trim());
+                    const suggestions = allCollaborators.filter(
+                      (n) =>
+                        !current.includes(n) &&
+                        n.toLowerCase().includes(collaboratorInput.toLowerCase()),
+                    );
+                    const addCollaborator = (name: string) => {
+                      const trimmed = name.trim();
+                      if (!trimmed || current.includes(trimmed)) return;
+                      setLog((prev) => ({
+                        ...prev,
+                        collaborators: [...prev.collaborators, trimmed],
+                      }));
+                      setCollaboratorInput("");
+                      setCollaboratorDropdown(false);
+                    };
+                    return (
+                      <div className="rounded-2xl bg-white p-4 shadow-sm sm:p-5">
+                        <label className="text-[11px] font-bold tracking-widest text-black uppercase">
+                          같이 일한 동료
+                        </label>
+                        <div className="relative mt-2">
+                          <div
+                            className={cn(
+                              "flex flex-wrap gap-1.5 rounded-xl border bg-[#f8f8f8] px-3 py-2.5 transition-all",
+                              collaboratorDropdown
+                                ? "border-black/25 bg-white"
+                                : "border-black/10",
+                            )}
+                          >
+                            {current.map((name) => (
+                              <span
+                                key={name}
+                                className="flex items-center gap-1 rounded-lg bg-black/8 px-2.5 py-1 text-sm font-bold text-black"
+                              >
+                                {name}
+                                <button
+                                  onClick={() =>
+                                    setLog((prev) => ({
+                                      ...prev,
+                                      collaborators: prev.collaborators.filter((n) => n !== name),
+                                    }))
+                                  }
+                                  className="ml-0.5 text-black/30 hover:text-black"
+                                >
+                                  <X size={12} />
+                                </button>
+                              </span>
+                            ))}
+                            <div className="flex min-w-[120px] flex-1 items-center gap-1.5">
+                              <UserPlus size={14} className="shrink-0 text-black/25" />
+                              <input
+                                type="text"
+                                value={collaboratorInput}
+                                onChange={(e) => {
+                                  setCollaboratorInput(e.target.value);
+                                  setCollaboratorDropdown(true);
+                                }}
+                                onFocus={() => setCollaboratorDropdown(true)}
+                                onBlur={() => setTimeout(() => setCollaboratorDropdown(false), 150)}
+                                onKeyDown={(e) => {
+                                  if (
+                                    (e.key === "Enter" || e.key === ",") &&
+                                    !e.nativeEvent.isComposing &&
+                                    collaboratorInput.trim()
+                                  ) {
+                                    e.preventDefault();
+                                    addCollaborator(collaboratorInput);
+                                  } else if (
+                                    e.key === "Backspace" &&
+                                    collaboratorInput === "" &&
+                                    current.length > 0
+                                  ) {
+                                    setLog((prev) => ({
+                                      ...prev,
+                                      collaborators: prev.collaborators.slice(0, -1),
+                                    }));
+                                  }
+                                }}
+                                placeholder={current.length === 0 ? "이름 입력 후 Enter" : ""}
+                                className="flex-1 border-none bg-transparent p-0 text-sm font-medium outline-none placeholder:text-black/20"
+                              />
+                              {isDuplicate && (
+                                <span className="shrink-0 text-[11px] font-bold text-amber-500">
+                                  이미 추가됨
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* 자동완성 드롭다운 */}
+                          {collaboratorDropdown && suggestions.length > 0 && (
+                            <div className="absolute top-full left-0 z-20 mt-1.5 w-full overflow-hidden rounded-xl border border-black/8 bg-white shadow-lg">
+                              {suggestions.map((name) => (
+                                <button
+                                  key={name}
+                                  onMouseDown={() => addCollaborator(name)}
+                                  className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-medium hover:bg-black/5"
+                                >
+                                  <UserPlus size={13} className="shrink-0 text-black/30" />
+                                  {name}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
                   <div className="rounded-2xl bg-white p-4 shadow-sm sm:p-5">
                     <label className="text-[11px] font-bold tracking-widest text-black uppercase">
                       한줄 요약

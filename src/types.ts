@@ -43,6 +43,7 @@ export interface WorkLog {
   todo_items: TodoItem[]; // todo_items 테이블에서 join
   kr_ids: string[]; // work_log_krs 테이블에서 join (KR 단위 연결)
   project_ids: string[]; // work_log_projects 테이블에서 join
+  collaborators: string[]; // 같이 일한 동료 이름 태그
 }
 
 export type ProjectStatus = "active" | "on_hold" | "completed" | "archived";
