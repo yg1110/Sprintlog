@@ -105,7 +105,7 @@ export const LogsPage: React.FC<LogsPageProps> = ({ logs, okrs, projects, onSave
         </div>
         <button
           onClick={() => openModal(new Date())}
-          className="flex items-center gap-2 rounded-xl bg-black px-4 py-2.5 text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95 sm:px-5"
+          className="flex items-center gap-2 rounded-xl bg-[#3182f6] px-4 py-2.5 text-sm font-bold text-white transition-all hover:bg-[#1b6ed4] active:scale-95 sm:px-5"
         >
           <Plus size={16} />
           오늘 기록하기
@@ -149,8 +149,8 @@ export const LogsPage: React.FC<LogsPageProps> = ({ logs, okrs, projects, onSave
                 style={{ aspectRatio: "1/1" }}
                 className={cn(
                   "flex flex-col justify-between rounded-2xl p-2 text-left transition-all xl:p-3",
-                  log ? "bg-black text-white shadow-md" : "bg-white shadow-sm hover:shadow-md",
-                  isToday(day) && !log && "ring-2 ring-black ring-offset-2",
+                  log ? "bg-[#3182f6] text-white shadow-md" : "bg-white shadow-sm hover:shadow-md",
+                  isToday(day) && !log && "ring-2 ring-[#3182f6] ring-offset-2",
                 )}
               >
                 <div className="flex items-center justify-between">

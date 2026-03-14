@@ -157,7 +157,7 @@ export function ArchivePage({ logs, projects, okrs, onOpenWorkLog }: ArchivePage
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="전체 내용 검색 (한 일, 이슈, 배운 점 등)"
-              className="w-full rounded-xl border border-black/10 bg-white py-2.5 pr-4 pl-9 text-sm font-medium transition-all outline-none focus:border-black/25"
+              className="w-full rounded-xl border border-[#e5e8eb] bg-white py-2.5 pr-4 pl-9 text-sm font-medium transition-all outline-none focus:border-[#3182f6]"
             />
             {search && (
               <button
@@ -173,8 +173,8 @@ export function ArchivePage({ logs, projects, okrs, onOpenWorkLog }: ArchivePage
             className={cn(
               "relative flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-bold transition-all",
               showFilters || activeFilterCount > 0
-                ? "border-black bg-black text-white"
-                : "border-black/10 bg-white text-black/50 hover:text-black",
+                ? "border-[#3182f6] bg-[#3182f6] text-white"
+                : "border-[#e5e8eb] bg-white text-[#6b7684] hover:text-[#191f28]",
             )}
           >
             <SlidersHorizontal size={15} />
@@ -583,7 +583,7 @@ function FilterSelect({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className={cn(
-            "w-full appearance-none rounded-xl border border-black/10 bg-[#f8f8f8] py-2 pr-7 text-sm font-medium transition-all outline-none focus:border-black/25 focus:bg-white",
+            "w-full appearance-none rounded-xl border border-[#e5e8eb] bg-[#f2f4f6] py-2 pr-7 text-sm font-medium transition-all outline-none focus:border-[#3182f6] focus:bg-white",
             icon ? "pl-8" : "pl-3",
             value !== "all" && "border-black bg-black/5 font-bold",
           )}

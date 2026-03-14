@@ -156,7 +156,7 @@ function AppRouter() {
   if (session === undefined) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-black/10 border-t-black" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#e5e8eb] border-t-[#3182f6]" />
       </div>
     );
   }
@@ -176,7 +176,7 @@ function AppRouter() {
     <Layout onLogout={handleLogout}>
       {loading ? (
         <div className="flex h-64 items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-black/10 border-t-black" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#e5e8eb] border-t-[#3182f6]" />
         </div>
       ) : (
         <>

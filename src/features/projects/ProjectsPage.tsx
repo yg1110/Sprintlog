@@ -7,6 +7,7 @@ import { EmptyState, SectionHeader } from "../../components/Layout";
 import { cn } from "../../lib/cn";
 import type { Project, WorkLog } from "../../types";
 import { PROJECT_STATUS_LABEL, type ProjectStatus } from "../../types";
+import { type ProjectDraft, ProjectModal } from "./ProjectModal";
 
 const STATUS_BADGE: Record<ProjectStatus, string> = {
   active: "bg-emerald-100 text-emerald-700",
@@ -14,17 +15,6 @@ const STATUS_BADGE: Record<ProjectStatus, string> = {
   completed: "bg-blue-100 text-blue-700",
   archived: "bg-black/8 text-black/40",
 };
-
-const PRESET_COLORS = [
-  "#6366F1",
-  "#3B82F6",
-  "#10B981",
-  "#F59E0B",
-  "#EF4444",
-  "#8B5CF6",
-  "#EC4899",
-  "#6B7280",
-];
 
 function createEmptyProject(): Omit<Project, "id"> {
   return {
@@ -63,7 +53,7 @@ export function ProjectsPage({
   onOpenWorkLog,
 }: ProjectsPageProps) {
   const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState<(Omit<Project, "id"> & { id?: string }) | null>(null);
+  const [editing, setEditing] = useState<ProjectDraft | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
@@ -95,10 +85,7 @@ export function ProjectsPage({
     if (statusFilter !== "all" && p.status !== statusFilter) return false;
     if (search.trim()) {
       const q = search.toLowerCase();
-      if (
-        !p.name.toLowerCase().includes(q) &&
-        !(p.description ?? "").toLowerCase().includes(q)
-      )
+      if (!p.name.toLowerCase().includes(q) && !(p.description ?? "").toLowerCase().includes(q))
         return false;
     }
     return true;
@@ -114,7 +101,7 @@ export function ProjectsPage({
         action={
           <button
             onClick={openCreate}
-            className="flex items-center gap-2 rounded-xl bg-black px-5 py-2.5 text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95"
+            className="flex items-center gap-2 rounded-xl bg-[#3182f6] px-5 py-2.5 text-sm font-bold text-white transition-all hover:bg-[#1b6ed4] active:scale-95"
           >
             <Plus size={16} />
             프로젝트 추가
@@ -131,7 +118,7 @@ export function ProjectsPage({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="프로젝트 이름 또는 설명으로 검색"
-            className="w-full rounded-xl border border-black/10 bg-white py-2.5 pr-4 pl-9 text-sm font-medium outline-none transition-all focus:border-black/25"
+            className="w-full rounded-xl border border-[#e5e8eb] bg-white py-2.5 pr-4 pl-9 text-sm font-medium transition-all outline-none focus:border-[#3182f6]"
           />
         </div>
         <div className="flex flex-wrap gap-2">
@@ -142,8 +129,8 @@ export function ProjectsPage({
               className={cn(
                 "rounded-lg px-3 py-1.5 text-xs font-bold transition-all",
                 statusFilter === f.value
-                  ? "bg-black text-white"
-                  : "bg-white text-black/40 hover:text-black",
+                  ? "bg-[#3182f6] text-white"
+                  : "bg-white text-[#6b7684] hover:text-[#191f28]",
               )}
             >
               {f.label}
@@ -194,136 +181,15 @@ export function ProjectsPage({
       )}
 
       {/* Create / Edit Modal */}
-      {modalOpen && editing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-            onClick={() => setModalOpen(false)}
-          />
-          <div className="relative w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl sm:p-8">
-            <h2 className="mb-5 text-xl font-black tracking-tight">
-              {editing.id ? "프로젝트 수정" : "프로젝트 추가"}
-            </h2>
-
-            <div className="space-y-4">
-              {/* Name */}
-              <div>
-                <label className="mb-1.5 block text-[11px] font-bold tracking-widest text-black/40 uppercase">
-                  프로젝트명 *
-                </label>
-                <input
-                  autoFocus
-                  type="text"
-                  value={editing.name}
-                  onChange={(e) => setEditing({ ...editing, name: e.target.value })}
-                  placeholder="프로젝트 이름을 입력하세요"
-                  className="w-full rounded-xl border border-black/10 bg-[#f8f8f8] px-4 py-2.5 text-sm font-medium outline-none transition-all focus:border-black/25 focus:bg-white"
-                />
-              </div>
-
-              {/* Description */}
-              <div>
-                <label className="mb-1.5 block text-[11px] font-bold tracking-widest text-black/40 uppercase">
-                  설명
-                </label>
-                <textarea
-                  rows={2}
-                  value={editing.description ?? ""}
-                  onChange={(e) => setEditing({ ...editing, description: e.target.value })}
-                  placeholder="프로젝트 설명 (선택)"
-                  className="w-full resize-none rounded-xl border border-black/10 bg-[#f8f8f8] px-4 py-2.5 text-sm font-medium outline-none transition-all focus:border-black/25 focus:bg-white"
-                />
-              </div>
-
-              {/* Color + Status */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="mb-1.5 block text-[11px] font-bold tracking-widest text-black/40 uppercase">
-                    색상
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {PRESET_COLORS.map((c) => (
-                      <button
-                        key={c}
-                        onClick={() => setEditing({ ...editing, color: c })}
-                        className={cn(
-                          "h-7 w-7 rounded-lg transition-all",
-                          editing.color === c
-                            ? "ring-2 ring-black ring-offset-2"
-                            : "hover:scale-110",
-                        )}
-                        style={{ backgroundColor: c }}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="mb-1.5 block text-[11px] font-bold tracking-widest text-black/40 uppercase">
-                    상태
-                  </label>
-                  <select
-                    value={editing.status}
-                    onChange={(e) =>
-                      setEditing({ ...editing, status: e.target.value as ProjectStatus })
-                    }
-                    className="w-full rounded-xl border border-black/10 bg-[#f8f8f8] px-3 py-2.5 text-sm font-medium outline-none transition-all focus:border-black/25 focus:bg-white"
-                  >
-                    {(["active", "on_hold", "completed", "archived"] as ProjectStatus[]).map(
-                      (s) => (
-                        <option key={s} value={s}>
-                          {PROJECT_STATUS_LABEL[s]}
-                        </option>
-                      ),
-                    )}
-                  </select>
-                </div>
-              </div>
-
-              {/* Dates */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="mb-1.5 block text-[11px] font-bold tracking-widest text-black/40 uppercase">
-                    시작일
-                  </label>
-                  <input
-                    type="date"
-                    value={editing.start_date ?? ""}
-                    onChange={(e) => setEditing({ ...editing, start_date: e.target.value })}
-                    className="w-full rounded-xl border border-black/10 bg-[#f8f8f8] px-3 py-2.5 text-sm font-medium outline-none transition-all focus:border-black/25 focus:bg-white"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-[11px] font-bold tracking-widest text-black/40 uppercase">
-                    종료일
-                  </label>
-                  <input
-                    type="date"
-                    value={editing.end_date ?? ""}
-                    onChange={(e) => setEditing({ ...editing, end_date: e.target.value })}
-                    className="w-full rounded-xl border border-black/10 bg-[#f8f8f8] px-3 py-2.5 text-sm font-medium outline-none transition-all focus:border-black/25 focus:bg-white"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6 flex items-center justify-end gap-3">
-              <button
-                onClick={() => setModalOpen(false)}
-                className="rounded-xl px-5 py-2.5 text-sm font-bold text-black/30 transition-colors hover:text-black"
-              >
-                취소
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={!editing.name.trim()}
-                className="rounded-xl bg-black px-6 py-2.5 text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95 disabled:opacity-40"
-              >
-                저장하기
-              </button>
-            </div>
-          </div>
-        </div>
+      {editing && (
+        <ProjectModal
+          isOpen={modalOpen}
+          project={editing}
+          setProject={setEditing as React.Dispatch<React.SetStateAction<ProjectDraft>>}
+          onClose={() => setModalOpen(false)}
+          onSave={handleSave}
+          isEditing={!!editing.id}
+        />
       )}
 
       {/* Delete confirm */}
@@ -424,11 +290,9 @@ function ProjectCard({
         </div>
       </div>
 
-      <h3 className="mb-1 text-lg font-bold leading-snug">{project.name}</h3>
+      <h3 className="mb-1 text-lg leading-snug font-bold">{project.name}</h3>
       {project.description && (
-        <p className="mb-4 text-sm font-medium text-black/40 line-clamp-2">
-          {project.description}
-        </p>
+        <p className="mb-4 line-clamp-2 text-sm font-medium text-black/40">{project.description}</p>
       )}
 
       {/* Linked logs */}
@@ -438,10 +302,7 @@ function ProjectCard({
           className="flex w-full items-center justify-between text-[11px] font-bold tracking-widest text-black/30 uppercase transition-colors hover:text-black/60"
         >
           <span>연결된 업무일지 {linkedLogs.length > 0 ? `${linkedLogs.length}건` : ""}</span>
-          <ChevronRight
-            size={13}
-            className={cn("transition-transform", expanded && "rotate-90")}
-          />
+          <ChevronRight size={13} className={cn("transition-transform", expanded && "rotate-90")} />
         </button>
 
         {expanded && (

@@ -488,7 +488,7 @@ export function DashboardPage({ logs, okrs, projects, onOpenWorkLog }: Dashboard
         </div>
         <button
           onClick={() => onOpenWorkLog(todayStr)}
-          className="flex items-center gap-1.5 rounded-xl bg-black px-4 py-2.5 text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95"
+          className="flex items-center gap-1.5 rounded-xl bg-[#3182f6] px-4 py-2.5 text-sm font-bold text-white transition-all hover:bg-[#1b6ed4] active:scale-95"
         >
           <Plus size={15} />
           오늘 기록
@@ -532,7 +532,7 @@ export function DashboardPage({ logs, okrs, projects, onOpenWorkLog }: Dashboard
           action={
             <button
               onClick={() => onOpenWorkLog(todayStr)}
-              className="flex items-center gap-1.5 rounded-xl bg-black px-4 py-2 text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95"
+              className="flex items-center gap-1.5 rounded-xl bg-[#3182f6] px-4 py-2 text-sm font-bold text-white transition-all hover:bg-[#1b6ed4] active:scale-95"
             >
               <Plus size={14} />
               기록 작성

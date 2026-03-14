@@ -4,7 +4,9 @@
       "Bash(pnpm add:*)",
       "Bash(pnpm lint:*)",
       "Bash(pnpm build:*)",
-      "Bash(pnpm dlx:*)"
+      "Bash(pnpm dlx:*)",
+      "WebFetch(domain:ko.designus.design)",
+      "WebFetch(domain:toss.im)"
     ]
   }
 }

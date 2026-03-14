@@ -1,6 +1,35 @@
 @import "tailwindcss";
 @source "../src";
 
+@theme {
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    system-ui, Roboto, "Helvetica Neue", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+
+  /* Toss brand colors */
+  --color-brand: #3182f6;
+  --color-brand-hover: #1b6ed4;
+  --color-brand-50: #ebf3ff;
+
+  /* Toss semantic */
+  --color-app-bg: #f7f8fa;
+  --color-surface: #ffffff;
+  --color-border: #e5e8eb;
+
+  /* Toss text */
+  --color-text-primary: #191f28;
+  --color-text-secondary: #6b7684;
+  --color-text-tertiary: #b0b8c1;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    color: #191f28;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
 html,
 body,
 #root {

@@ -69,15 +69,15 @@ export function OKRModal({ isOpen, okr, setOkr, onClose, onSave, isEditing }: OK
                 <h2 className="text-xl font-black tracking-tight">
                   {isEditing ? "OKR 수정" : "새로운 OKR 추가"}
                 </h2>
-                <p className="mt-1 text-sm text-black/40">
+                <p className="mt-1 text-sm text-[#6b7684]">
                   달성하고자 하는 목표와 핵심 결과를 설정하세요.
                 </p>
               </div>
               <button
                 onClick={onClose}
-                className="flex h-10 w-10 items-center justify-center rounded-xl bg-black/5 transition-colors hover:bg-black/10"
+                className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f2f4f6] transition-colors hover:bg-[#e5e8eb]"
               >
-                <X size={20} />
+                <X size={20} className="text-[#6b7684]" />
               </button>
             </div>
 
@@ -152,12 +152,12 @@ export function OKRModal({ isOpen, okr, setOkr, onClose, onSave, isEditing }: OK
               {/* Key Results */}
               <div>
                 <div className="mb-3 flex items-center justify-between">
-                  <label className="text-xs font-bold tracking-widest text-black/40 uppercase">
+                  <label className="text-[12px] font-semibold text-[#6b7684]">
                     핵심 결과 (Key Results)
                   </label>
                   <button
                     onClick={addKR}
-                    className="flex items-center gap-1 text-xs font-bold text-black/50 transition-colors hover:text-black"
+                    className="flex items-center gap-1 text-xs font-bold text-[#3182f6] transition-colors hover:text-[#1b6ed4]"
                   >
                     <Plus size={13} />
                     추가하기
@@ -165,7 +165,7 @@ export function OKRModal({ isOpen, okr, setOkr, onClose, onSave, isEditing }: OK
                 </div>
                 <div className="space-y-3">
                   {okr.key_results.map((kr, idx) => (
-                    <div key={kr.id} className="relative rounded-2xl bg-black/3 p-4">
+                    <div key={kr.id} className="relative rounded-2xl border border-[#e5e8eb] bg-[#f7f8fa] p-4">
                       <button
                         onClick={() => removeKR(kr.id)}
                         className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-lg text-red-400 transition-colors hover:bg-red-50"
@@ -221,16 +221,16 @@ export function OKRModal({ isOpen, okr, setOkr, onClose, onSave, isEditing }: OK
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-end gap-3 border-t border-black/5 px-8 py-5">
+            <div className="flex items-center justify-end gap-3 border-t border-[#e5e8eb] px-8 py-5">
               <button
                 onClick={onClose}
-                className="rounded-xl px-5 py-2.5 text-sm font-bold text-black/40 transition-colors hover:text-black"
+                className="rounded-xl px-5 py-2.5 text-sm font-bold text-[#6b7684] transition-colors hover:text-[#191f28]"
               >
                 취소
               </button>
               <button
                 onClick={onSave}
-                className="rounded-xl bg-black px-6 py-2.5 text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95"
+                className="rounded-xl bg-[#3182f6] px-6 py-2.5 text-sm font-bold text-white transition-all hover:bg-[#1b6ed4] active:scale-95"
               >
                 {isEditing ? "저장하기" : "추가하기"}
               </button>
@@ -245,11 +245,11 @@ export function OKRModal({ isOpen, okr, setOkr, onClose, onSave, isEditing }: OK
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-bold tracking-widest text-black/40 uppercase">{label}</label>
+      <label className="text-[12px] font-semibold text-[#6b7684]">{label}</label>
       {children}
     </div>
   );
 }
 
 const inputClass =
-  "w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium outline-none transition-all focus:border-black/20";
+  "w-full rounded-xl border border-[#e5e8eb] bg-white px-4 py-2.5 text-sm font-medium outline-none transition-all focus:border-[#3182f6]";

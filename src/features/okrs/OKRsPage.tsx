@@ -116,7 +116,7 @@ export function OKRsPage({ okrs, logs, onSaveOKR, onDeleteOKR, onOpenWorkLog }: 
         action={
           <button
             onClick={openCreate}
-            className="flex items-center gap-2 rounded-xl bg-black px-5 py-2.5 text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95"
+            className="flex items-center gap-2 rounded-xl bg-[#3182f6] px-5 py-2.5 text-sm font-bold text-white transition-all hover:bg-[#1b6ed4] active:scale-95"
           >
             <Plus size={16} />
             OKR 추가
@@ -133,7 +133,7 @@ export function OKRsPage({ okrs, logs, onSaveOKR, onDeleteOKR, onOpenWorkLog }: 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="목표 또는 KR 이름으로 검색"
-            className="w-full rounded-xl border border-black/10 bg-white py-2.5 pr-4 pl-9 text-sm font-medium outline-none transition-all focus:border-black/25"
+            className="w-full rounded-xl border border-[#e5e8eb] bg-white py-2.5 pr-4 pl-9 text-sm font-medium outline-none transition-all focus:border-[#3182f6]"
           />
         </div>
         <div className="flex flex-wrap gap-2">
@@ -144,8 +144,8 @@ export function OKRsPage({ okrs, logs, onSaveOKR, onDeleteOKR, onOpenWorkLog }: 
               className={cn(
                 "rounded-lg px-3 py-1.5 text-xs font-bold transition-all",
                 statusFilter === f.value
-                  ? "bg-black text-white"
-                  : "bg-white text-black/40 hover:text-black",
+                  ? "bg-[#3182f6] text-white"
+                  : "bg-white text-[#6b7684] hover:text-[#191f28]",
               )}
             >
               {f.label}
@@ -159,8 +159,8 @@ export function OKRsPage({ okrs, logs, onSaveOKR, onDeleteOKR, onOpenWorkLog }: 
               className={cn(
                 "rounded-lg px-3 py-1.5 text-xs font-bold transition-all",
                 periodFilter === f.value
-                  ? "bg-black text-white"
-                  : "bg-white text-black/40 hover:text-black",
+                  ? "bg-[#3182f6] text-white"
+                  : "bg-white text-[#6b7684] hover:text-[#191f28]",
               )}
             >
               {f.label}

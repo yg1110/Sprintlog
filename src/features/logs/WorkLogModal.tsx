@@ -161,22 +161,22 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative flex h-[92vh] w-full flex-col overflow-hidden overscroll-none rounded-t-[28px] bg-[#f5f5f5] shadow-2xl sm:max-w-4xl sm:rounded-[32px]"
+            className="relative flex h-[92vh] w-full flex-col overflow-hidden overscroll-none rounded-t-[28px] bg-[#f7f8fa] shadow-2xl sm:max-w-4xl sm:rounded-[32px]"
           >
             {/* Header */}
-            <div className="sticky top-0 z-10 border-b border-black/5 bg-white px-5 py-4 sm:px-8 sm:py-5">
+            <div className="sticky top-0 z-10 border-b border-[#e5e8eb] bg-white px-5 py-4 sm:px-8 sm:py-5">
               {confirmDelete ? (
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-black text-red-500">업무일지를 삭제할까요?</p>
-                    <p className="mt-0.5 text-xs font-medium text-black/40">
+                    <p className="mt-0.5 text-xs font-medium text-[#6b7684]">
                       이 작업은 되돌릴 수 없습니다.
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setConfirmDelete(false)}
-                      className="rounded-xl px-4 py-2 text-sm font-bold text-black/40 transition-colors hover:text-black"
+                      className="rounded-xl px-4 py-2 text-sm font-bold text-[#6b7684] transition-colors hover:text-[#191f28]"
                     >
                       취소
                     </button>
@@ -194,7 +194,7 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                     <h2 className="text-xl font-black tracking-tight">
                       {log.log_date.replace(/-/g, ".")}
                     </h2>
-                    <p className="mt-0.5 text-sm font-medium text-black/30">
+                    <p className="mt-0.5 text-sm font-medium text-[#6b7684]">
                       오늘의 업무를 기록하세요
                     </p>
                   </div>
@@ -202,16 +202,16 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                     {log.id && onDelete && (
                       <button
                         onClick={() => setConfirmDelete(true)}
-                        className="flex h-10 w-10 items-center justify-center rounded-xl bg-black/5 text-black transition-colors hover:bg-black/10"
+                        className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f2f4f6] text-[#6b7684] transition-colors hover:bg-[#e5e8eb]"
                       >
                         <Trash2 size={17} />
                       </button>
                     )}
                     <button
                       onClick={onClose}
-                      className="flex h-10 w-10 items-center justify-center rounded-xl bg-black/5 transition-colors hover:bg-black/10"
+                      className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f2f4f6] transition-colors hover:bg-[#e5e8eb]"
                     >
-                      <X size={20} />
+                      <X size={20} className="text-[#6b7684]" />
                     </button>
                   </div>
                 </div>
@@ -219,7 +219,7 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
             </div>
 
             {/* Tabs */}
-            <div className="flex border-b border-black/5 bg-white px-5 sm:px-8">
+            <div className="flex border-b border-[#e5e8eb] bg-white px-5 sm:px-8">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
@@ -227,8 +227,8 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                   className={cn(
                     "border-b-2 px-5 py-3.5 text-sm font-bold transition-all",
                     activeTab === tab.id
-                      ? "border-black text-black"
-                      : "border-transparent text-black/30 hover:text-black/60",
+                      ? "border-[#3182f6] text-[#3182f6]"
+                      : "border-transparent text-[#6b7684] hover:text-[#191f28]",
                   )}
                 >
                   {tab.label}
@@ -237,7 +237,7 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto overscroll-contain bg-[#f5f5f5] p-4 sm:p-6">
+            <div className="flex-1 overflow-y-auto overscroll-contain bg-[#f7f8fa] p-4 sm:p-6">
               {activeTab === "todo" && (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <TodoSection
@@ -282,21 +282,21 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                       setCollaboratorDropdown(false);
                     };
                     return (
-                      <div className="rounded-2xl bg-white p-4 shadow-sm sm:p-5">
-                        <label className="text-[11px] font-bold tracking-widest text-black uppercase">
+                      <div className="rounded-2xl border border-[#e5e8eb] bg-white p-4 sm:p-5">
+                        <label className="text-[12px] font-semibold text-[#6b7684]">
                           같이 일한 동료
                         </label>
                         <div className="relative mt-2">
                           <div
                             className={cn(
-                              "flex flex-wrap gap-1.5 rounded-xl border bg-[#f8f8f8] px-3 py-2.5 transition-all",
-                              collaboratorDropdown ? "border-black/25 bg-white" : "border-black/10",
+                              "flex flex-wrap gap-1.5 rounded-xl border bg-[#f2f4f6] px-3 py-2.5 transition-all",
+                              collaboratorDropdown ? "border-[#3182f6] bg-white" : "border-[#e5e8eb]",
                             )}
                           >
                             {current.map((name) => (
                               <span
                                 key={name}
-                                className="flex items-center gap-1 rounded-lg bg-black/8 px-2.5 py-1 text-sm font-bold text-black"
+                                className="flex items-center gap-1 rounded-lg bg-[#ebf3ff] px-2.5 py-1 text-sm font-bold text-[#3182f6]"
                               >
                                 {name}
                                 <button
@@ -306,14 +306,14 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                                       collaborators: prev.collaborators.filter((n) => n !== name),
                                     }))
                                   }
-                                  className="ml-0.5 text-black/30 hover:text-black"
+                                  className="ml-0.5 text-[#3182f6]/50 hover:text-[#3182f6]"
                                 >
                                   <X size={12} />
                                 </button>
                               </span>
                             ))}
                             <div className="flex min-w-[120px] flex-1 items-center gap-1.5">
-                              <UserPlus size={14} className="shrink-0 text-black/25" />
+                              <UserPlus size={14} className="shrink-0 text-[#6b7684]" />
                               <input
                                 type="text"
                                 value={collaboratorInput}
@@ -343,7 +343,7 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                                   }
                                 }}
                                 placeholder={current.length === 0 ? "이름 입력 후 Enter" : ""}
-                                className="flex-1 border-none bg-transparent p-0 text-sm font-medium outline-none placeholder:text-black/20"
+                                className="flex-1 border-none bg-transparent p-0 text-sm font-medium outline-none placeholder:text-[#b0b8c1]"
                               />
                               {isDuplicate && (
                                 <span className="shrink-0 text-[11px] font-bold text-amber-500">
@@ -355,14 +355,14 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
 
                           {/* 자동완성 드롭다운 */}
                           {collaboratorDropdown && suggestions.length > 0 && (
-                            <div className="absolute top-full left-0 z-20 mt-1.5 w-full overflow-hidden rounded-xl border border-black/8 bg-white shadow-lg">
+                            <div className="absolute top-full left-0 z-20 mt-1.5 w-full overflow-hidden rounded-xl border border-[#e5e8eb] bg-white shadow-lg">
                               {suggestions.map((name) => (
                                 <button
                                   key={name}
                                   onMouseDown={() => addCollaborator(name)}
-                                  className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-medium hover:bg-black/5"
+                                  className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-medium hover:bg-[#f2f4f6]"
                                 >
-                                  <UserPlus size={13} className="shrink-0 text-black/30" />
+                                  <UserPlus size={13} className="shrink-0 text-[#6b7684]" />
                                   {name}
                                 </button>
                               ))}
@@ -373,15 +373,15 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                     );
                   })()}
 
-                  <div className="rounded-2xl bg-white p-4 shadow-sm sm:p-5">
-                    <label className="text-[11px] font-bold tracking-widest text-black uppercase">
+                  <div className="rounded-2xl border border-[#e5e8eb] bg-white p-4 sm:p-5">
+                    <label className="text-[12px] font-semibold text-[#6b7684]">
                       한줄 요약
                     </label>
                     <textarea
                       rows={2}
                       value={log.summary}
                       onChange={(e) => setLog({ ...log, summary: e.target.value })}
-                      className="mt-2 w-full resize-none rounded-xl border border-black/10 bg-[#f8f8f8] px-4 py-3 text-sm font-medium transition-all outline-none focus:border-black/25 focus:bg-white"
+                      className="mt-2 w-full resize-none rounded-xl border border-[#e5e8eb] bg-[#f2f4f6] px-4 py-3 text-sm font-medium transition-all outline-none focus:border-[#3182f6] focus:bg-white"
                       placeholder="오늘 하루를 한줄로 요약해주세요"
                     />
                   </div>
@@ -443,8 +443,8 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                           "예: 작업 전 예상 소요 시간 기록 → 실제와 비교해 추정 정확도 높이기\n예: PR 단위를 기능 전체가 아닌 500줄 이하로 쪼개 리뷰 속도 개선",
                       },
                     ].map((field) => (
-                      <div key={field.key} className="rounded-2xl bg-white p-4 shadow-sm">
-                        <label className="text-[11px] font-bold tracking-widest text-black uppercase">
+                      <div key={field.key} className="rounded-2xl border border-[#e5e8eb] bg-white p-4">
+                        <label className="text-[12px] font-semibold text-[#6b7684]">
                           {field.label}
                         </label>
                         <textarea
@@ -452,7 +452,7 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                           onChange={(e) => setLog({ ...log, [field.key]: e.target.value })}
                           rows={3}
                           placeholder={field.placeholder}
-                          className="mt-2 w-full resize-none rounded-xl border border-black/10 bg-[#f8f8f8] px-4 py-3 text-sm font-medium transition-all outline-none focus:border-black/25 focus:bg-white"
+                          className="mt-2 w-full resize-none rounded-xl border border-[#e5e8eb] bg-[#f2f4f6] px-4 py-3 text-sm font-medium transition-all outline-none focus:border-[#3182f6] focus:bg-white"
                         />
                       </div>
                     ))}
@@ -462,7 +462,7 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
 
               {activeTab === "okr" && (
                 <div className="space-y-4">
-                  <p className="px-1 text-[11px] font-bold tracking-widest text-black/40 uppercase">
+                  <p className="px-1 text-[12px] font-semibold text-[#6b7684]">
                     관련 핵심 결과(KR) 선택
                   </p>
 
@@ -470,7 +470,7 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                   <div className="relative">
                     <Search
                       size={15}
-                      className="absolute top-1/2 left-3.5 -translate-y-1/2 text-black/30"
+                      className="absolute top-1/2 left-3.5 -translate-y-1/2 text-[#b0b8c1]"
                     />
                     <input
                       type="text"
@@ -480,18 +480,18 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                         setKrLimit(10);
                       }}
                       placeholder="KR 또는 목표 이름으로 검색"
-                      className="w-full rounded-xl border border-black/10 bg-white py-2.5 pr-4 pl-9 text-sm font-medium transition-all outline-none focus:border-black/25"
+                      className="w-full rounded-xl border border-[#e5e8eb] bg-white py-2.5 pr-4 pl-9 text-sm font-medium transition-all outline-none focus:border-[#3182f6]"
                     />
                   </div>
 
                   {allKRs.length === 0 && (
-                    <div className="rounded-2xl bg-white py-12 text-center font-bold text-black/20 shadow-sm">
+                    <div className="rounded-2xl border border-[#e5e8eb] bg-white py-12 text-center font-bold text-[#b0b8c1]">
                       등록된 OKR이 없습니다.
                     </div>
                   )}
 
                   {allKRs.length > 0 && filteredKRs.length === 0 && (
-                    <div className="rounded-2xl bg-white py-12 text-center font-bold text-black/20 shadow-sm">
+                    <div className="rounded-2xl border border-[#e5e8eb] bg-white py-12 text-center font-bold text-[#b0b8c1]">
                       검색 결과가 없습니다.
                     </div>
                   )}
@@ -504,18 +504,18 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                           key={kr.id}
                           onClick={() => handleToggleKR(kr.id)}
                           className={cn(
-                            "flex items-start gap-3 rounded-2xl border-2 p-4 text-left shadow-sm transition-all",
+                            "flex items-start gap-3 rounded-2xl border-2 p-4 text-left transition-all",
                             selected
-                              ? "border-blue-500 bg-blue-50"
-                              : "border-transparent bg-white hover:border-black/15",
+                              ? "border-[#3182f6] bg-[#ebf3ff]"
+                              : "border-transparent bg-white hover:border-[#e5e8eb]",
                           )}
                         >
                           <div
                             className={cn(
                               "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all",
                               selected
-                                ? "border-blue-500 bg-blue-500 text-white"
-                                : "border-black/20",
+                                ? "border-[#3182f6] bg-[#3182f6] text-white"
+                                : "border-[#b0b8c1]",
                             )}
                           >
                             {selected && <Check size={12} />}
@@ -524,7 +524,7 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                             <div
                               className={cn(
                                 "text-sm font-bold",
-                                selected ? "text-blue-700" : "text-black",
+                                selected ? "text-[#3182f6]" : "text-[#191f28]",
                               )}
                             >
                               {kr.title || "제목 없음"}
@@ -532,7 +532,7 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                             <div
                               className={cn(
                                 "mt-0.5 text-[11px] font-medium",
-                                selected ? "text-blue-500" : "text-black/40",
+                                selected ? "text-[#3182f6]" : "text-[#6b7684]",
                               )}
                             >
                               {okr.title}
@@ -540,7 +540,7 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                             <div
                               className={cn(
                                 "mt-0.5 text-[11px] font-medium",
-                                selected ? "text-blue-400" : "text-black/30",
+                                selected ? "text-[#3182f6]/70" : "text-[#b0b8c1]",
                               )}
                             >
                               {kr.current_value} / {kr.target_value}
@@ -555,7 +555,7 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                   {filteredKRs.length > krLimit && (
                     <button
                       onClick={() => setKrLimit((prev) => prev + 10)}
-                      className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-white py-3 text-sm font-bold text-black/40 shadow-sm transition-all hover:text-black"
+                      className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#e5e8eb] bg-white py-3 text-sm font-bold text-[#6b7684] transition-all hover:text-[#191f28]"
                     >
                       <ChevronDown size={15} />
                       더보기 ({filteredKRs.length - krLimit}개 남음)
@@ -566,7 +566,7 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
 
               {activeTab === "project" && (
                 <div className="space-y-4">
-                  <p className="px-1 text-[11px] font-bold tracking-widest text-black/40 uppercase">
+                  <p className="px-1 text-[12px] font-semibold text-[#6b7684]">
                     프로젝트 선택
                   </p>
 
@@ -574,7 +574,7 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                   <div className="relative">
                     <Search
                       size={15}
-                      className="absolute top-1/2 left-3.5 -translate-y-1/2 text-black/30"
+                      className="absolute top-1/2 left-3.5 -translate-y-1/2 text-[#b0b8c1]"
                     />
                     <input
                       type="text"
@@ -584,18 +584,18 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                         setProjectLimit(10);
                       }}
                       placeholder="프로젝트 이름으로 검색"
-                      className="w-full rounded-xl border border-black/10 bg-white py-2.5 pr-4 pl-9 text-sm font-medium transition-all outline-none focus:border-black/25"
+                      className="w-full rounded-xl border border-[#e5e8eb] bg-white py-2.5 pr-4 pl-9 text-sm font-medium transition-all outline-none focus:border-[#3182f6]"
                     />
                   </div>
 
                   {selectableProjects.length === 0 && (
-                    <div className="rounded-2xl bg-white py-12 text-center font-bold text-black/20 shadow-sm">
+                    <div className="rounded-2xl border border-[#e5e8eb] bg-white py-12 text-center font-bold text-[#b0b8c1]">
                       등록된 프로젝트가 없습니다.
                     </div>
                   )}
 
                   {selectableProjects.length > 0 && filteredProjects.length === 0 && (
-                    <div className="rounded-2xl bg-white py-12 text-center font-bold text-black/20 shadow-sm">
+                    <div className="rounded-2xl border border-[#e5e8eb] bg-white py-12 text-center font-bold text-[#b0b8c1]">
                       검색 결과가 없습니다.
                     </div>
                   )}
@@ -610,14 +610,14 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                           className={cn(
                             "flex items-start gap-3 rounded-2xl border-2 p-4 text-left shadow-sm transition-all",
                             selected
-                              ? "border-black bg-black/5"
-                              : "border-transparent bg-white hover:border-black/15",
+                              ? "border-[#3182f6] bg-[#ebf3ff]"
+                              : "border-transparent bg-white hover:border-[#e5e8eb]",
                           )}
                         >
                           <div
                             className={cn(
                               "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all",
-                              selected ? "border-black bg-black text-white" : "border-black/20",
+                              selected ? "border-[#3182f6] bg-[#3182f6] text-white" : "border-[#b0b8c1]",
                             )}
                           >
                             {selected && <Check size={12} />}
@@ -628,14 +628,14 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                                 className="h-2.5 w-2.5 shrink-0 rounded-full"
                                 style={{ backgroundColor: project.color }}
                               />
-                              <div className="text-sm font-bold text-black">{project.name}</div>
+                              <div className="text-sm font-bold text-[#191f28]">{project.name}</div>
                             </div>
                             {project.description && (
-                              <div className="mt-0.5 line-clamp-1 text-[11px] font-medium text-black/40">
+                              <div className="mt-0.5 line-clamp-1 text-[11px] font-medium text-[#6b7684]">
                                 {project.description}
                               </div>
                             )}
-                            <div className="mt-0.5 text-[11px] font-medium text-black/30">
+                            <div className="mt-0.5 text-[11px] font-medium text-[#b0b8c1]">
                               {PROJECT_STATUS_LABEL[project.status]}
                             </div>
                           </div>
@@ -647,7 +647,7 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                   {filteredProjects.length > projectLimit && (
                     <button
                       onClick={() => setProjectLimit((prev) => prev + 10)}
-                      className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-white py-3 text-sm font-bold text-black/40 shadow-sm transition-all hover:text-black"
+                      className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#e5e8eb] bg-white py-3 text-sm font-bold text-[#6b7684] transition-all hover:text-[#191f28]"
                     >
                       <ChevronDown size={15} />
                       더보기 ({filteredProjects.length - projectLimit}개 남음)
@@ -658,17 +658,17 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-end gap-3 border-t border-black/5 bg-white px-5 py-4 sm:px-8 sm:py-5">
+            <div className="flex items-center justify-end gap-3 border-t border-[#e5e8eb] bg-white px-5 py-4 sm:px-8 sm:py-5">
               <button
                 onClick={onClose}
-                className="rounded-xl px-5 py-2.5 text-sm font-bold text-black/30 transition-colors hover:text-black"
+                className="rounded-xl px-5 py-2.5 text-sm font-bold text-[#6b7684] transition-colors hover:text-[#191f28]"
               >
                 취소
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="rounded-xl bg-black px-6 py-2.5 text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95 disabled:opacity-50"
+                className="rounded-xl bg-[#3182f6] px-6 py-2.5 text-sm font-bold text-white transition-all hover:bg-[#1b6ed4] active:scale-95 disabled:opacity-50"
               >
                 {saving ? "저장 중..." : "저장하기"}
               </button>
@@ -696,12 +696,12 @@ function TodoSection({
   onRemove: (id: string) => void;
 }) {
   return (
-    <div className="min-h-[59dvh] rounded-2xl bg-white p-4 shadow-sm sm:p-5">
+    <div className="min-h-[59dvh] rounded-2xl border border-[#e5e8eb] bg-white p-4 sm:p-5">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-sm font-bold text-black">{title}</h3>
+        <h3 className="text-sm font-bold text-[#191f28]">{title}</h3>
         <button
           onClick={onAdd}
-          className="flex items-center gap-1 rounded-lg bg-black/5 px-2.5 py-1.5 text-xs font-bold text-black/50 transition-colors hover:bg-black/10 hover:text-black"
+          className="flex items-center gap-1 rounded-lg bg-[#f2f4f6] px-2.5 py-1.5 text-xs font-bold text-[#6b7684] transition-colors hover:bg-[#e5e8eb] hover:text-[#191f28]"
         >
           <Plus size={13} /> 추가
         </button>
@@ -710,15 +710,15 @@ function TodoSection({
         {todos.map((todo) => (
           <div
             key={todo.id}
-            className="group flex items-center gap-3 rounded-xl border border-black/5 bg-[#f8f8f8] px-3 py-2.5"
+            className="group flex items-center gap-3 rounded-xl border border-[#e5e8eb] bg-white px-3 py-2.5"
           >
             <button
               onClick={() => onToggle(todo.id)}
               className={cn(
                 "flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border-2 transition-all",
                 todo.is_done
-                  ? "border-black bg-black text-white"
-                  : "border-black/20 hover:border-black/40",
+                  ? "border-[#3182f6] bg-[#3182f6] text-white"
+                  : "border-[#b0b8c1] hover:border-[#3182f6]",
               )}
             >
               {todo.is_done && <Check size={13} />}
@@ -730,19 +730,19 @@ function TodoSection({
               placeholder="할 일을 입력하세요"
               className={cn(
                 "flex-1 border-none bg-transparent p-0 text-sm font-medium outline-none focus:ring-0",
-                todo.is_done ? "text-black/30 line-through" : "text-black",
+                todo.is_done ? "text-[#b0b8c1] line-through" : "text-[#191f28]",
               )}
             />
             <button
               onClick={() => onRemove(todo.id)}
-              className="text-black/20 opacity-0 transition-all group-hover:opacity-100 hover:text-red-500"
+              className="text-[#b0b8c1] opacity-0 transition-all group-hover:opacity-100 hover:text-red-500"
             >
               <Trash2 size={14} />
             </button>
           </div>
         ))}
         {todos.length === 0 && (
-          <p className="py-4 text-center text-sm text-black/25">할 일을 추가해보세요</p>
+          <p className="py-4 text-center text-sm text-[#b0b8c1]">할 일을 추가해보세요</p>
         )}
       </div>
     </div>
