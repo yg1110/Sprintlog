@@ -130,9 +130,10 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
   const selectableProjects = projects.filter((p) => p.status !== "archived");
 
   const filteredProjects = projectSearch.trim()
-    ? selectableProjects.filter((p) =>
-        p.name.toLowerCase().includes(projectSearch.toLowerCase()) ||
-        (p.description ?? "").toLowerCase().includes(projectSearch.toLowerCase()),
+    ? selectableProjects.filter(
+        (p) =>
+          p.name.toLowerCase().includes(projectSearch.toLowerCase()) ||
+          (p.description ?? "").toLowerCase().includes(projectSearch.toLowerCase()),
       )
     : selectableProjects;
 
@@ -264,8 +265,7 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                   {(() => {
                     const current = log.collaborators ?? [];
                     const isDuplicate =
-                      collaboratorInput.trim() !== "" &&
-                      current.includes(collaboratorInput.trim());
+                      collaboratorInput.trim() !== "" && current.includes(collaboratorInput.trim());
                     const suggestions = allCollaborators.filter(
                       (n) =>
                         !current.includes(n) &&
@@ -290,9 +290,7 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                           <div
                             className={cn(
                               "flex flex-wrap gap-1.5 rounded-xl border bg-[#f8f8f8] px-3 py-2.5 transition-all",
-                              collaboratorDropdown
-                                ? "border-black/25 bg-white"
-                                : "border-black/10",
+                              collaboratorDropdown ? "border-black/25 bg-white" : "border-black/10",
                             )}
                           >
                             {current.map((name) => (
@@ -508,26 +506,43 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                           className={cn(
                             "flex items-start gap-3 rounded-2xl border-2 p-4 text-left shadow-sm transition-all",
                             selected
-                              ? "border-black bg-black/5"
+                              ? "border-blue-500 bg-blue-50"
                               : "border-transparent bg-white hover:border-black/15",
                           )}
                         >
                           <div
                             className={cn(
                               "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all",
-                              selected ? "border-black bg-black text-white" : "border-black/20",
+                              selected
+                                ? "border-blue-500 bg-blue-500 text-white"
+                                : "border-black/20",
                             )}
                           >
                             {selected && <Check size={12} />}
                           </div>
                           <div className="min-w-0">
-                            <div className="text-sm font-bold text-black">
+                            <div
+                              className={cn(
+                                "text-sm font-bold",
+                                selected ? "text-blue-700" : "text-black",
+                              )}
+                            >
                               {kr.title || "제목 없음"}
                             </div>
-                            <div className="mt-0.5 text-[11px] font-medium text-black/40">
+                            <div
+                              className={cn(
+                                "mt-0.5 text-[11px] font-medium",
+                                selected ? "text-blue-500" : "text-black/40",
+                              )}
+                            >
                               {okr.title}
                             </div>
-                            <div className="mt-0.5 text-[11px] font-medium text-black/30">
+                            <div
+                              className={cn(
+                                "mt-0.5 text-[11px] font-medium",
+                                selected ? "text-blue-400" : "text-black/30",
+                              )}
+                            >
                               {kr.current_value} / {kr.target_value}
                               {kr.unit ? ` ${kr.unit}` : ""}
                             </div>
@@ -569,7 +584,7 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                         setProjectLimit(10);
                       }}
                       placeholder="프로젝트 이름으로 검색"
-                      className="w-full rounded-xl border border-black/10 bg-white py-2.5 pr-4 pl-9 text-sm font-medium outline-none transition-all focus:border-black/25"
+                      className="w-full rounded-xl border border-black/10 bg-white py-2.5 pr-4 pl-9 text-sm font-medium transition-all outline-none focus:border-black/25"
                     />
                   </div>
 
@@ -616,7 +631,7 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                               <div className="text-sm font-bold text-black">{project.name}</div>
                             </div>
                             {project.description && (
-                              <div className="mt-0.5 text-[11px] font-medium text-black/40 line-clamp-1">
+                              <div className="mt-0.5 line-clamp-1 text-[11px] font-medium text-black/40">
                                 {project.description}
                               </div>
                             )}

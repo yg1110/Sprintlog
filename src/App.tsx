@@ -185,7 +185,7 @@ function AppRouter() {
             <Route path="/auth" element={<Navigate to="/dashboard" replace />} />
             <Route
               path="/dashboard"
-              element={<DashboardPage logs={logs} okrs={okrs} onOpenWorkLog={handleOpenWorkLog} />}
+              element={<DashboardPage logs={logs} okrs={okrs} projects={projects} onOpenWorkLog={handleOpenWorkLog} />}
             />
             <Route
               path="/okrs"
@@ -215,7 +215,7 @@ function AppRouter() {
               path="/work-logs"
               element={<LogsPage logs={logs} okrs={okrs} projects={projects} onSaveLog={handleSaveLog} onDeleteLog={handleDeleteLog} />}
             />
-            <Route path="/archive" element={<ArchivePage logs={logs} onOpenWorkLog={handleOpenWorkLog} />} />
+            <Route path="/archive" element={<ArchivePage logs={logs} projects={projects} okrs={okrs} onOpenWorkLog={handleOpenWorkLog} />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
 

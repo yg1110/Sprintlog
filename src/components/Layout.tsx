@@ -1,4 +1,12 @@
-import { Archive, BarChart3, BookOpen, FolderKanban, LayoutDashboard, LogOut, Target } from "lucide-react";
+import {
+  Archive,
+  BarChart3,
+  BookOpen,
+  FolderKanban,
+  LayoutDashboard,
+  LogOut,
+  Target,
+} from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 
 import { cn } from "../lib/cn";
@@ -12,8 +20,8 @@ const navItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "대시보드" },
   { to: "/okrs", icon: Target, label: "OKR" },
   { to: "/projects", icon: FolderKanban, label: "프로젝트" },
-  { to: "/work-logs", icon: BookOpen, label: "업무기록" },
-  { to: "/archive", icon: Archive, label: "업무 아카이브" },
+  { to: "/work-logs", icon: BookOpen, label: "업무 기록" },
+  { to: "/archive", icon: Archive, label: "업무 검색" },
 ];
 
 export function Layout({ children, onLogout }: LayoutProps) {
