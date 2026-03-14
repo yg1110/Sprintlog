@@ -10,18 +10,23 @@ import { LogsPage } from "./features/logs/LogsPage";
 import { WorkLogModal } from "./features/logs/WorkLogModal";
 import type { OKRDraft } from "./features/okrs/OKRModal";
 import { OKRsPage } from "./features/okrs/OKRsPage";
+import { ProjectsPage } from "./features/projects/ProjectsPage";
 import {
   createOKR,
+  createProject,
   deleteOKR,
+  deleteProject,
   deleteWorkLog,
   getOKRs,
+  getProjects,
   getWorkLogs,
   signOut,
   updateOKR,
+  updateProject,
   upsertWorkLog,
 } from "./lib/api";
 import { supabase } from "./lib/supabase";
-import type { OKR, WorkLog } from "./types";
+import type { OKR, Project, WorkLog } from "./types";
 
 const EMPTY_LOG = (dateStr: string): WorkLog => ({
   log_date: dateStr,
@@ -37,12 +42,14 @@ const EMPTY_LOG = (dateStr: string): WorkLog => ({
   improvement_text: "",
   todo_items: [],
   kr_ids: [],
+  project_ids: [],
 });
 
 function AppRouter() {
   const [session, setSession] = useState<Session | null | undefined>(undefined); // undefined = 로딩 중
   const [okrs, setOkrs] = useState<OKR[]>([]);
   const [logs, setLogs] = useState<WorkLog[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
 
   // Dashboard 빠른 업무기록 모달
@@ -60,10 +67,11 @@ function AppRouter() {
   useEffect(() => {
     if (!session) return;
     setLoading(true);
-    Promise.all([getOKRs(), getWorkLogs()])
-      .then(([o, l]) => {
+    Promise.all([getOKRs(), getWorkLogs(), getProjects()])
+      .then(([o, l, p]) => {
         setOkrs(o);
         setLogs(l);
+        setProjects(p);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -115,6 +123,21 @@ function AppRouter() {
   const handleDeleteOKR = async (id: string) => {
     await deleteOKR(id);
     setOkrs((prev) => prev.filter((o) => o.id !== id));
+  };
+
+  const handleSaveProject = async (project: Omit<Project, "id"> & { id?: string }) => {
+    if (project.id) {
+      const updated = await updateProject(project.id, project as Omit<Project, "id">);
+      setProjects((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+    } else {
+      const created = await createProject(project as Omit<Project, "id">);
+      setProjects((prev) => [created, ...prev]);
+    }
+  };
+
+  const handleDeleteProject = async (id: string) => {
+    await deleteProject(id);
+    setProjects((prev) => prev.filter((p) => p.id !== id));
   };
 
   const handleDeleteLog = async (id: string) => {
@@ -176,8 +199,20 @@ function AppRouter() {
               }
             />
             <Route
+              path="/projects"
+              element={
+                <ProjectsPage
+                  projects={projects}
+                  logs={logs}
+                  onSaveProject={handleSaveProject}
+                  onDeleteProject={handleDeleteProject}
+                  onOpenWorkLog={handleOpenWorkLog}
+                />
+              }
+            />
+            <Route
               path="/work-logs"
-              element={<LogsPage logs={logs} okrs={okrs} onSaveLog={handleSaveLog} onDeleteLog={handleDeleteLog} />}
+              element={<LogsPage logs={logs} okrs={okrs} projects={projects} onSaveLog={handleSaveLog} onDeleteLog={handleDeleteLog} />}
             />
             <Route path="/archive" element={<ArchivePage logs={logs} onOpenWorkLog={handleOpenWorkLog} />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
@@ -194,6 +229,7 @@ function AppRouter() {
             log={dashLog}
             setLog={setDashLog}
             okrs={okrs}
+            projects={projects}
           />
         </>
       )}

@@ -323,3 +323,135 @@ create policy "work_log_krs_delete_own"
 on public.work_log_krs
 for delete
 using (user_id = auth.uid());
+
+-- =========================================================
+-- 14. projects
+--
+-- 프로젝트 단위 관리 테이블
+-- status: active(진행중) | on_hold(보류) | completed(완료) | archived(보관)
+-- color: 태그·캘린더 표시용 hex 코드 (예: '#3B82F6')
+-- =========================================================
+create table if not exists public.projects (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.profiles(id) on delete cascade,
+
+  name text not null,
+  description text,
+  color text not null default '#6B7280',  -- 기본: gray-500
+
+  status text not null default 'active' check (
+    status in ('active', 'on_hold', 'completed', 'archived')
+  ),
+
+  start_date date,
+  end_date date,
+
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+
+  check (end_date is null or start_date is null or end_date >= start_date)
+);
+
+comment on table public.projects is '프로젝트 관리 테이블';
+comment on column public.projects.color is '표시용 hex 색상 코드 (예: #3B82F6)';
+
+create index if not exists idx_projects_user_id on public.projects(user_id);
+create index if not exists idx_projects_status on public.projects(status);
+
+-- =========================================================
+-- 15. work_log_projects
+-- 업무기록 <-> 프로젝트 다대다 연결
+-- (하나의 업무일지에 여러 프로젝트, 하나의 프로젝트에 여러 업무일지)
+-- =========================================================
+create table if not exists public.work_log_projects (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  work_log_id uuid not null references public.work_logs(id) on delete cascade,
+  project_id uuid not null references public.projects(id) on delete cascade,
+
+  created_at timestamptz not null default now(),
+
+  unique (work_log_id, project_id)
+);
+
+comment on table public.work_log_projects is '업무기록과 프로젝트 연결 테이블';
+
+create index if not exists idx_work_log_projects_user_id on public.work_log_projects(user_id);
+create index if not exists idx_work_log_projects_work_log_id on public.work_log_projects(work_log_id);
+create index if not exists idx_work_log_projects_project_id on public.work_log_projects(project_id);
+
+-- =========================================================
+-- 16. projects updated_at 트리거
+-- =========================================================
+drop trigger if exists trg_projects_set_updated_at on public.projects;
+create trigger trg_projects_set_updated_at
+before update on public.projects
+for each row
+execute function public.set_updated_at();
+
+-- =========================================================
+-- 17. projects / work_log_projects RLS 활성화
+-- =========================================================
+alter table public.projects enable row level security;
+alter table public.work_log_projects enable row level security;
+
+-- =========================================================
+-- 18. 기존 정책 삭제 (재실행 안전)
+-- =========================================================
+drop policy if exists "projects_select_own" on public.projects;
+drop policy if exists "projects_insert_own" on public.projects;
+drop policy if exists "projects_update_own" on public.projects;
+drop policy if exists "projects_delete_own" on public.projects;
+
+drop policy if exists "work_log_projects_select_own" on public.work_log_projects;
+drop policy if exists "work_log_projects_insert_own" on public.work_log_projects;
+drop policy if exists "work_log_projects_update_own" on public.work_log_projects;
+drop policy if exists "work_log_projects_delete_own" on public.work_log_projects;
+
+-- =========================================================
+-- 19. projects 정책
+-- =========================================================
+create policy "projects_select_own"
+on public.projects
+for select
+using (user_id = auth.uid());
+
+create policy "projects_insert_own"
+on public.projects
+for insert
+with check (user_id = auth.uid());
+
+create policy "projects_update_own"
+on public.projects
+for update
+using (user_id = auth.uid())
+with check (user_id = auth.uid());
+
+create policy "projects_delete_own"
+on public.projects
+for delete
+using (user_id = auth.uid());
+
+-- =========================================================
+-- 20. work_log_projects 정책
+-- =========================================================
+create policy "work_log_projects_select_own"
+on public.work_log_projects
+for select
+using (user_id = auth.uid());
+
+create policy "work_log_projects_insert_own"
+on public.work_log_projects
+for insert
+with check (user_id = auth.uid());
+
+create policy "work_log_projects_update_own"
+on public.work_log_projects
+for update
+using (user_id = auth.uid())
+with check (user_id = auth.uid());
+
+create policy "work_log_projects_delete_own"
+on public.work_log_projects
+for delete
+using (user_id = auth.uid());

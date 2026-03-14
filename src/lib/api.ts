@@ -1,4 +1,4 @@
-import type { OKR, TodoItem, WorkLog } from "../types";
+import type { OKR, Project, TodoItem, WorkLog } from "../types";
 import { supabase } from "./supabase";
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
@@ -73,6 +73,52 @@ export async function deleteOKR(id: string): Promise<void> {
 
 // ─── Work Logs ───────────────────────────────────────────────────────────────
 
+// ─── Projects ─────────────────────────────────────────────────────────────────
+
+const PROJECT_SELECT = "id, name, description, color, status, start_date, end_date";
+
+export async function getProjects(): Promise<Project[]> {
+  const { data, error } = await supabase
+    .from("projects")
+    .select(PROJECT_SELECT)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as Project[];
+}
+
+export async function createProject(project: Omit<Project, "id">): Promise<Project> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("로그인이 필요합니다.");
+
+  const { data, error } = await supabase
+    .from("projects")
+    .insert({ ...project, user_id: user.id })
+    .select(PROJECT_SELECT)
+    .single();
+  if (error) throw error;
+  return data as Project;
+}
+
+export async function updateProject(id: string, project: Omit<Project, "id">): Promise<Project> {
+  const { data, error } = await supabase
+    .from("projects")
+    .update(project)
+    .eq("id", id)
+    .select(PROJECT_SELECT)
+    .single();
+  if (error) throw error;
+  return data as Project;
+}
+
+export async function deleteProject(id: string): Promise<void> {
+  const { error } = await supabase.from("projects").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// ─── Work Logs ───────────────────────────────────────────────────────────────
+
 type WorkLogRow = {
   id: string;
   log_date: string;
@@ -88,6 +134,7 @@ type WorkLogRow = {
   improvement_text: string | null;
   todo_items: { id: string; time_slot: string; content: string; is_done: boolean; display_order: number }[];
   work_log_krs: { kr_id: string }[];
+  work_log_projects: { project_id: string }[];
 };
 
 function rowToWorkLog(row: WorkLogRow): WorkLog {
@@ -106,6 +153,7 @@ function rowToWorkLog(row: WorkLogRow): WorkLog {
     improvement_text: row.improvement_text ?? "",
     todo_items: (row.todo_items ?? []) as TodoItem[],
     kr_ids: (row.work_log_krs ?? []).map((r) => r.kr_id),
+    project_ids: (row.work_log_projects ?? []).map((r) => r.project_id),
   };
 }
 
@@ -113,7 +161,7 @@ export async function getWorkLogs(): Promise<WorkLog[]> {
   const { data, error } = await supabase
     .from("work_logs")
     .select(
-      "id, log_date, summary, done_text, issue_text, blocked_text, decision_text, learned_text, tomorrow_plan_text, metric_change_text, feedback_text, improvement_text, todo_items(id, time_slot, content, is_done, display_order), work_log_krs(kr_id)",
+      "id, log_date, summary, done_text, issue_text, blocked_text, decision_text, learned_text, tomorrow_plan_text, metric_change_text, feedback_text, improvement_text, todo_items(id, time_slot, content, is_done, display_order), work_log_krs(kr_id), work_log_projects(project_id)",
     )
     .order("log_date", { ascending: false });
   if (error) throw error;
@@ -184,11 +232,24 @@ export async function upsertWorkLog(log: WorkLog): Promise<WorkLog> {
     if (krLinkError) throw krLinkError;
   }
 
-  // 4. 최종 데이터 반환
+  // 4. work_log_projects 동기화
+  await supabase.from("work_log_projects").delete().eq("work_log_id", workLogId);
+  if ((log.project_ids ?? []).length > 0) {
+    const { error: projLinkError } = await supabase.from("work_log_projects").insert(
+      log.project_ids.map((project_id) => ({
+        work_log_id: workLogId,
+        project_id,
+        user_id: user.id,
+      })),
+    );
+    if (projLinkError) throw projLinkError;
+  }
+
+  // 5. 최종 데이터 반환
   const { data: fullData, error: fetchError } = await supabase
     .from("work_logs")
     .select(
-      "id, log_date, summary, done_text, issue_text, blocked_text, decision_text, learned_text, tomorrow_plan_text, metric_change_text, feedback_text, improvement_text, todo_items(id, time_slot, content, is_done, display_order), work_log_krs(kr_id)",
+      "id, log_date, summary, done_text, issue_text, blocked_text, decision_text, learned_text, tomorrow_plan_text, metric_change_text, feedback_text, improvement_text, todo_items(id, time_slot, content, is_done, display_order), work_log_krs(kr_id), work_log_projects(project_id)",
     )
     .eq("id", workLogId)
     .single();

@@ -3,7 +3,8 @@ import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 
 import { cn } from "../../lib/cn";
-import type { OKR, TimeSlot, TodoItem, WorkLog } from "../../types";
+import type { OKR, Project, TimeSlot, TodoItem, WorkLog } from "../../types";
+import { PROJECT_STATUS_LABEL } from "../../types";
 
 interface WorkLogModalProps {
   isOpen: boolean;
@@ -13,6 +14,7 @@ interface WorkLogModalProps {
   log: WorkLog;
   setLog: React.Dispatch<React.SetStateAction<WorkLog>>;
   okrs: OKR[];
+  projects: Project[];
 }
 
 export const WorkLogModal: React.FC<WorkLogModalProps> = ({
@@ -23,12 +25,15 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
   log,
   setLog,
   okrs,
+  projects,
 }) => {
-  const [activeTab, setActiveTab] = useState<"todo" | "details" | "okr">("todo");
+  const [activeTab, setActiveTab] = useState<"todo" | "details" | "okr" | "project">("todo");
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [krSearch, setKrSearch] = useState("");
   const [krLimit, setKrLimit] = useState(10);
+  const [projectSearch, setProjectSearch] = useState("");
+  const [projectLimit, setProjectLimit] = useState(10);
 
   const todosBySlot = (slot: TimeSlot) =>
     log.todo_items
@@ -66,6 +71,14 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
       ...prev,
       todo_items: prev.todo_items.filter((t) => t.id !== id),
     }));
+  };
+
+  const handleToggleProject = (projectId: string) => {
+    const current = log.project_ids ?? [];
+    const updated = current.includes(projectId)
+      ? current.filter((id) => id !== projectId)
+      : [...current, projectId];
+    setLog((prev) => ({ ...prev, project_ids: updated }));
   };
 
   const handleToggleKR = (krId: string) => {
@@ -110,10 +123,22 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
 
   const visibleKRs = filteredKRs.slice(0, krLimit);
 
+  const selectableProjects = projects.filter((p) => p.status !== "archived");
+
+  const filteredProjects = projectSearch.trim()
+    ? selectableProjects.filter((p) =>
+        p.name.toLowerCase().includes(projectSearch.toLowerCase()) ||
+        (p.description ?? "").toLowerCase().includes(projectSearch.toLowerCase()),
+      )
+    : selectableProjects;
+
+  const visibleProjects = filteredProjects.slice(0, projectLimit);
+
   const tabs = [
     { id: "todo", label: "할 일" },
     { id: "details", label: "상세 기록" },
     { id: "okr", label: "OKR 연결" },
+    { id: "project", label: "프로젝트 연결" },
   ] as const;
 
   return (
@@ -400,6 +425,98 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
                     >
                       <ChevronDown size={15} />
                       더보기 ({filteredKRs.length - krLimit}개 남음)
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {activeTab === "project" && (
+                <div className="space-y-4">
+                  <p className="px-1 text-[11px] font-bold tracking-widest text-black/40 uppercase">
+                    프로젝트 선택
+                  </p>
+
+                  {/* Search */}
+                  <div className="relative">
+                    <Search
+                      size={15}
+                      className="absolute top-1/2 left-3.5 -translate-y-1/2 text-black/30"
+                    />
+                    <input
+                      type="text"
+                      value={projectSearch}
+                      onChange={(e) => {
+                        setProjectSearch(e.target.value);
+                        setProjectLimit(10);
+                      }}
+                      placeholder="프로젝트 이름으로 검색"
+                      className="w-full rounded-xl border border-black/10 bg-white py-2.5 pr-4 pl-9 text-sm font-medium outline-none transition-all focus:border-black/25"
+                    />
+                  </div>
+
+                  {selectableProjects.length === 0 && (
+                    <div className="rounded-2xl bg-white py-12 text-center font-bold text-black/20 shadow-sm">
+                      등록된 프로젝트가 없습니다.
+                    </div>
+                  )}
+
+                  {selectableProjects.length > 0 && filteredProjects.length === 0 && (
+                    <div className="rounded-2xl bg-white py-12 text-center font-bold text-black/20 shadow-sm">
+                      검색 결과가 없습니다.
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    {visibleProjects.map((project) => {
+                      const selected = (log.project_ids ?? []).includes(project.id);
+                      return (
+                        <button
+                          key={project.id}
+                          onClick={() => handleToggleProject(project.id)}
+                          className={cn(
+                            "flex items-start gap-3 rounded-2xl border-2 p-4 text-left shadow-sm transition-all",
+                            selected
+                              ? "border-black bg-black/5"
+                              : "border-transparent bg-white hover:border-black/15",
+                          )}
+                        >
+                          <div
+                            className={cn(
+                              "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all",
+                              selected ? "border-black bg-black text-white" : "border-black/20",
+                            )}
+                          >
+                            {selected && <Check size={12} />}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="h-2.5 w-2.5 shrink-0 rounded-full"
+                                style={{ backgroundColor: project.color }}
+                              />
+                              <div className="text-sm font-bold text-black">{project.name}</div>
+                            </div>
+                            {project.description && (
+                              <div className="mt-0.5 text-[11px] font-medium text-black/40 line-clamp-1">
+                                {project.description}
+                              </div>
+                            )}
+                            <div className="mt-0.5 text-[11px] font-medium text-black/30">
+                              {PROJECT_STATUS_LABEL[project.status]}
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {filteredProjects.length > projectLimit && (
+                    <button
+                      onClick={() => setProjectLimit((prev) => prev + 10)}
+                      className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-white py-3 text-sm font-bold text-black/40 shadow-sm transition-all hover:text-black"
+                    >
+                      <ChevronDown size={15} />
+                      더보기 ({filteredProjects.length - projectLimit}개 남음)
                     </button>
                   )}
                 </div>

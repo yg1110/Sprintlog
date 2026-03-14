@@ -14,7 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import { cn } from "../../lib/cn";
-import type { OKR, WorkLog } from "../../types";
+import type { OKR, Project, WorkLog } from "../../types";
 import { WorkLogModal } from "./WorkLogModal";
 
 const EMPTY_LOG = (dateStr: string): WorkLog => ({
@@ -31,16 +31,18 @@ const EMPTY_LOG = (dateStr: string): WorkLog => ({
   improvement_text: "",
   todo_items: [],
   kr_ids: [],
+  project_ids: [],
 });
 
 interface LogsPageProps {
   logs: WorkLog[];
   okrs: OKR[];
+  projects: Project[];
   onSaveLog: (log: WorkLog) => Promise<void>;
   onDeleteLog: (id: string) => Promise<void>;
 }
 
-export const LogsPage: React.FC<LogsPageProps> = ({ logs, okrs, onSaveLog, onDeleteLog }) => {
+export const LogsPage: React.FC<LogsPageProps> = ({ logs, okrs, projects, onSaveLog, onDeleteLog }) => {
   const location = useLocation();
   const openDate = (location.state as { openDate?: string } | null)?.openDate;
 
@@ -196,6 +198,7 @@ export const LogsPage: React.FC<LogsPageProps> = ({ logs, okrs, onSaveLog, onDel
         log={editingLog}
         setLog={setEditingLog}
         okrs={okrs}
+        projects={projects}
       />
     </div>
   );

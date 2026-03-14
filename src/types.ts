@@ -42,6 +42,26 @@ export interface WorkLog {
   improvement_text: string;
   todo_items: TodoItem[]; // todo_items 테이블에서 join
   kr_ids: string[]; // work_log_krs 테이블에서 join (KR 단위 연결)
+  project_ids: string[]; // work_log_projects 테이블에서 join
+}
+
+export type ProjectStatus = "active" | "on_hold" | "completed" | "archived";
+
+export const PROJECT_STATUS_LABEL: Record<ProjectStatus, string> = {
+  active: "진행중",
+  on_hold: "보류",
+  completed: "완료",
+  archived: "보관",
+};
+
+export interface Project {
+  id: string;
+  name: string;
+  description?: string;
+  color: string;
+  status: ProjectStatus;
+  start_date?: string;
+  end_date?: string;
 }
 
 export interface OKR {
