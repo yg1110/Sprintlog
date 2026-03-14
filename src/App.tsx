@@ -143,7 +143,27 @@ function AppRouter() {
 
   const handleDeleteLog = async (id: string) => {
     await deleteWorkLog(id);
-    setLogs((prev) => prev.filter((l) => l.id !== id));
+    const remainingLogs = logs.filter((l) => l.id !== id);
+    setLogs(remainingLogs);
+
+    // 연결된 OKR의 KR current_value 동기화
+    const updatedOKRs: OKR[] = [];
+    for (const okr of okrs) {
+      const newKeyResults = okr.key_results.map((kr) => ({
+        ...kr,
+        current_value: remainingLogs.filter((l) => (l.kr_ids ?? []).includes(kr.id)).length,
+      }));
+      const changed = newKeyResults.some(
+        (kr, i) => kr.current_value !== okr.key_results[i]?.current_value,
+      );
+      if (changed) {
+        const updated = await updateOKR(okr.id, { ...okr, key_results: newKeyResults });
+        updatedOKRs.push(updated);
+      }
+    }
+    if (updatedOKRs.length > 0) {
+      setOkrs((prev) => prev.map((o) => updatedOKRs.find((u) => u.id === o.id) ?? o));
+    }
   };
 
   const handleOpenWorkLog = (date: string) => {
