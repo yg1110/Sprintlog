@@ -40,6 +40,7 @@ export interface WorkLog {
   metric_change_text: string;
   feedback_text: string;
   improvement_text: string;
+  memo_text: string; // JSON: MemoEntry[]
   todo_items: TodoItem[]; // todo_items 테이블에서 join
   kr_ids: string[]; // work_log_krs 테이블에서 join (KR 단위 연결)
   project_ids: string[]; // work_log_projects 테이블에서 join

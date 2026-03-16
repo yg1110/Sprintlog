@@ -76,6 +76,7 @@ create table if not exists public.work_logs (
   metric_change_text text,
   feedback_text text,
   improvement_text text,
+  memo_text text not null default '[]',
 
   collaborators text[] not null default '{}',
 
@@ -471,3 +472,7 @@ alter table public.work_logs
 -- collaborators GIN 인덱스 (이미 없을 경우에만 생성)
 create index if not exists idx_work_logs_collaborators
   on public.work_logs using gin(collaborators);
+
+-- work_logs 에 memo_text 컬럼 추가
+alter table public.work_logs
+  add column if not exists memo_text text not null default '[]';

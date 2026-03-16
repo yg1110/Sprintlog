@@ -29,6 +29,7 @@ const EMPTY_LOG = (dateStr: string): WorkLog => ({
   metric_change_text: "",
   feedback_text: "",
   improvement_text: "",
+  memo_text: "[]",
   todo_items: [],
   kr_ids: [],
   project_ids: [],
