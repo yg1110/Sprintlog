@@ -92,8 +92,7 @@ export function MemoTab({ log, setLog }: MemoTabProps) {
           onClick={handleAdd}
           className="flex items-center gap-1.5 rounded-xl bg-[#3182f6] px-3.5 py-2 text-xs font-bold text-white transition-all hover:bg-[#1b6ed4] active:scale-95"
         >
-          <Plus size={13} />
-          새 메모
+          <Plus size={13} />새 메모
         </button>
       </div>
 
@@ -113,7 +112,7 @@ export function MemoTab({ log, setLog }: MemoTabProps) {
             className="group rounded-2xl border border-[#e5e8eb] bg-white p-4 sm:p-5"
           >
             <div className="mb-2 flex items-center justify-between">
-              <span className="rounded-lg bg-[#f2f4f6] px-2.5 py-1 text-[11px] font-bold tabular-nums text-[#6b7684]">
+              <span className="rounded-lg bg-[#f2f4f6] px-2.5 py-1 text-[11px] font-bold text-[#6b7684] tabular-nums">
                 {entry.timestamp}
               </span>
               <button
@@ -131,7 +130,7 @@ export function MemoTab({ log, setLog }: MemoTabProps) {
               value={entry.content}
               onChange={(e) => handleChange(entry.id, e.target.value)}
               onFocus={() => handleFocus(entry.id)}
-              rows={4}
+              rows={15}
               placeholder="메모를 입력하세요..."
               className="w-full resize-none rounded-xl border border-[#e5e8eb] bg-[#f2f4f6] px-4 py-3 text-sm font-medium transition-all outline-none focus:border-[#3182f6] focus:bg-white"
             />

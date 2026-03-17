@@ -1,5 +1,5 @@
 import type { Session } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import { Layout } from "./components/Layout";
@@ -65,9 +65,13 @@ function AppRouter() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  // 로그인 후 데이터 로드
+  // 로그인 후 데이터 로드 — 토큰 갱신(TOKEN_REFRESHED)은 무시하고 유저가 실제로 바뀔 때만 재로드
+  const loadedUserIdRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!session) return;
+    const userId = session?.user.id ?? null;
+    if (userId === loadedUserIdRef.current) return;
+    loadedUserIdRef.current = userId;
+    if (!userId) return;
     setLoading(true);
     Promise.all([getOKRs(), getWorkLogs(), getProjects()])
       .then(([o, l, p]) => {

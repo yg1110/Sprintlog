@@ -153,17 +153,23 @@ export const WorkLogModal: React.FC<WorkLogModalProps> = ({
               ))}
             </div>
 
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto overscroll-contain bg-[#f7f8fa] p-4 sm:p-6">
-              {activeTab === "todo" && <TodoTab log={log} setLog={setLog} />}
-              {activeTab === "details" && (
+            {/* Content — 항상 마운트, 비활성 탭은 hidden으로 숨김 (state 유지) */}
+            <div className="flex-1 overflow-y-auto overscroll-contain bg-[#f7f8fa]">
+              <div className={cn("p-4 sm:p-6", activeTab !== "todo" && "hidden")}>
+                <TodoTab log={log} setLog={setLog} />
+              </div>
+              <div className={cn("p-4 sm:p-6", activeTab !== "details" && "hidden")}>
                 <DetailsTab log={log} setLog={setLog} allCollaborators={allCollaborators} />
-              )}
-              {activeTab === "memo" && <MemoTab log={log} setLog={setLog} />}
-              {activeTab === "okr" && <OkrTab log={log} setLog={setLog} okrs={okrs} />}
-              {activeTab === "project" && (
+              </div>
+              <div className={cn("p-4 sm:p-6", activeTab !== "memo" && "hidden")}>
+                <MemoTab log={log} setLog={setLog} />
+              </div>
+              <div className={cn("p-4 sm:p-6", activeTab !== "okr" && "hidden")}>
+                <OkrTab log={log} setLog={setLog} okrs={okrs} />
+              </div>
+              <div className={cn("p-4 sm:p-6", activeTab !== "project" && "hidden")}>
                 <ProjectTab log={log} setLog={setLog} projects={projects} />
-              )}
+              </div>
             </div>
 
             {/* Footer */}

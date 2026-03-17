@@ -534,7 +534,7 @@ function LogCard({
                   <p className="mb-0.5 text-[10px] font-bold tracking-widest text-black/40 uppercase">
                     {f.emoji} {f.label}
                   </p>
-                  <p className="line-clamp-2 text-sm leading-relaxed whitespace-pre-wrap text-black/70">
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap text-black/70">
                     {search ? highlight(val, search) : val}
                   </p>
                 </div>
